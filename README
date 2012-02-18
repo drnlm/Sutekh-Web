@@ -1,0 +1,14 @@
+This is a simple flask based web-interface to the sutekh card database
+
+It currently allows:
+
+* Displaying the WW card list
+* Display the details of a card
+* Browsing your collection of card sets
+* Browsing a card set
+
+
+Current requirments:
+
+Flask 0.8
+Jinja2 2.6
