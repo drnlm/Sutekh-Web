@@ -1,0 +1,23 @@
+<title>{{ cardset.name }}</title>
+<h1>{{ cardset.name }}</h1>
+{% if cardset.author %}
+<h2>{{ cardset.author }}</h2>
+{% endif %}
+{% if cardset.comment %}
+<h2>Description</h2>
+<p>{{ cardset.comment }}</p>
+{% endif %}
+{% if cardset.annotations %}
+<h2>Annotations</h2>
+<p>{{ cardset.annotations }}</p>
+{% endif %}
+
+<!-- This should be made prettier -->
+
+{% for group, cards in grouped %}
+<h2>{{ group }}</h2>
+{% for card, cnt in cards %}
+<p>{{ cnt }} x <a href="/card?name={{ card.name }}&source=cardsetview&cardset={{ cardset.name }}">{{ card.name }}</a></p>
+{% endfor %}
+{% endfor %}
+

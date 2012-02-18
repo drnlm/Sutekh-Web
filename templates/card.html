@@ -1,0 +1,60 @@
+<title>Card Details for {{ card.name }}</title>
+<h1>{{ card.name }}</h1>
+{% if card.cardtype %}
+<h2>Card Type</h2>
+<ul>
+   {% for type in card.cardtype %}
+   <li>{{ type.name }}
+   {% endfor %}
+</ul>
+{% endif %}
+{% if card.keywords %}
+<h2>Keywords</h2>
+<ul>
+   {% for item in card.keywords %}
+   <li>{{ item.keyword }}</li>
+   {% endfor %}
+</ul>
+{% endif %}
+{% if card.clan %}
+<h2>Clan</h2>
+<ul>
+   {% for item in card.clan %}
+   <li>{{ item.name }}</li>
+   {% endfor %}
+</ul>
+{% endif %}
+{% if card.creed %}
+<h2>Creed</h2>
+<ul>
+   {% for item in card.creed %}
+   <li>{{ item.name }}</li>
+   {% endfor %}
+</ul>
+{% endif %}
+{% if card.virtue %}
+<h2>Virtues</h2>
+<ul>
+   {% for item in card.virtue %}
+   <li>{{ item.name }}</li>
+   {% endfor %}
+</ul>
+{% endif %}
+{% if card.discipline %}
+<h2>Disciplines</h2>
+<ul>
+   {% for item in card.discipline|sort(attribute='discipline.name') if item.level != 'superior' %}
+   <li>{{ item.discipline.name|lower }}</li>
+   {% endfor %}
+   {% for item in card.discipline|sort(attribute='discipline.name') if item.level == 'superior' %}
+   <li>{{ item.discipline.name|upper }}</li>
+   {% endfor %}
+</ul>
+{% endif %}
+{% if card.text %}
+<h2>Text</h2>
+{{ card.text }}
+{% endif %}
+{% if parent %}
+<p><a href="{{ parent }}">Go Back</a></p>
+{% endif %}

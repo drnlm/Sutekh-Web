@@ -1,0 +1,13 @@
+<!doctype html>
+<title>Error: Invalid {{ type }}</title>
+<h1>Error: Invalid {{ type }} Specified</h1>
+<h2>Choose an Option</h2>
+<ul>
+   <li><a href="/cardsets">List Card Sets</a></li>
+   {% for group in groupings %}
+   <li><a href="/cardlist?grouping={{ group }}">Browse the cardlist (with {{ group }} grouping)</a></li>
+   {% endfor %}
+</ul>
+{% if parent %}
+<p><a href="{{ parent }}">Go Back</a></p>
+{% endif %}
