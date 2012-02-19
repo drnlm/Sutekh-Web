@@ -33,6 +33,10 @@ div#content p {
    padding-bottom: 0px;
 }
 
+span.errata {
+   color: #f88;
+}
+
 div#navigation {
    float: right;
    text-align: right;

@@ -109,9 +109,14 @@ def print_card(sCardName):
         oCard = None
     if oCard:
         if oCard.text:
+            # Mark errata clearly
+            sText = oCard.text.replace('{',
+                    '<span class="errata">').replace('}', '</span>')
             # We split text into lines, so they can be neatly
             # formatted by the template
-            aText = oCard.text.split("\n")
+            # FIXME: This is messy - should we preserve more formatting
+            # in the database?
+            aText = sText.split("\n")
             if '. [' in aText[-1]:
                 # Split discipline level text
                 aSplit = aText.pop().split('. [')

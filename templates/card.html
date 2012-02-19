@@ -56,8 +56,9 @@
 {% if card.text %}
 <div id="text">
    <h2>Text</h2>
+   <!-- this needs to be marked as safe so the errata span works -->
    {% for line in text %}
-   <p>{{ line }}</p>
+   <p>{{ line|safe }}</p>
    {% endfor %}
 </div>
 {% endif %}
