@@ -22,7 +22,18 @@ body {
    letter-spacing: .5em;
 }
 
-div.navigation {
+div#content li {
+   margin-top: 1px;
+}
+
+div#content p {
+   margin-top: 0px;
+   margin-bottom: 0px;
+   padding-top: 0px;
+   padding-bottom: 0px;
+}
+
+div#navigation {
    float: right;
    text-align: right;
    margin-top: 3px;
