@@ -71,21 +71,12 @@ def cardsets():
     return render_template('cardsets.html', cardsets=aCardSets)
 
 
-@app.route('/cardsetview')
-def cardsetview():
-    sCardSetName = request.args.get('name', 'No Card')
+@app.route('/cardsetview/<sCardSetName>')
+def cardsetview(sCardSetName):
     try:
         oCS = IPhysicalCardSet(sCardSetName)
     except SQLObjectNotFound:
-        # We try this, as &'s in the name confuse flask
-        # XXX: There must be a better way to do this
-        _, sData = request.url.split('?name=')
-        sCardSetName = urllib.unquote(sData)
-        print sData, sCardSetName
-        try:
-            oCS = IPhysicalCardSet(sCardSetName)
-        except SQLObjectNotFound:
-            oCS = None
+        oCS = None
     if oCS:
         dCards = {}
         for oCard in oCS.cards:
@@ -100,10 +91,9 @@ def cardsetview():
                 parent=None)
 
 
-@app.route('/card')
-def print_card():
+@app.route('/card/<sCardName>')
+def print_card(sCardName):
     """Display card details"""
-    sCardName = request.args.get('name', 'No Card')
     sSource = request.args.get('source', None)
     sGrouping = request.args.get('grouping', None)
     sCardSet = request.args.get('cardset', None)

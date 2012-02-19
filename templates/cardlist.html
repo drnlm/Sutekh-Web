@@ -8,7 +8,7 @@
 {% for group, cards in grouped %}
 <h2>{{ group }}</h2>
 {% for card in cards %}
-<p><a href="/card?name={{ card.name }}&source=cardlist&grouping={{ groupby }}">{{ card.name }}</a></p>
+<p><a href="/card/{{ card.name }}?source=cardlist&grouping={{ groupby }}">{{ card.name }}</a></p>
 {% endfor %}
 {% endfor %}
 
