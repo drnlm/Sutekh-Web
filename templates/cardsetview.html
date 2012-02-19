@@ -16,8 +16,8 @@
 
 {% for group, cards in grouped %}
 <h2>{{ group }}</h2>
-{% for card, cnt in cards %}
-<p>{{ cnt }} x <a href="/card?name={{ card.name }}&source=cardsetview&cardset={{ cardset.name }}">{{ card.name }}</a></p>
+{% for item in cards|sort(attribute='card.name') %}
+<p>{{ item.cnt }} x <a href="/card?name={{ item.card.name }}&source=cardsetview&cardset={{ cardset.name }}">{{ item.card.name }}</a></p>
 {% endfor %}
 {% endfor %}
 

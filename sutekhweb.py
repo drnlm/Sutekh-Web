@@ -31,17 +31,27 @@ ALLOWED_GROUPINGS = {
         }
 
 
+# Utility classes for passing info the jinja2 easily
+class CardSetTree(object):
+    """object used to build up card set trees for the jinja template"""
+
+    def __init__(self, sName):
+        self.name = sName
+        self.children = []
+
+
+class CardCount(object):
+
+    def __init__(self, oCard):
+        self.card = oCard
+        self.cnt = 0
+
+
+
 @app.route('/')
 def start():
     return render_template('index.html', groupings=sorted(ALLOWED_GROUPINGS))
 
-
-class CardSetTree(object):
-    """object used to build up card set trees for the jinja template"""
-
-    def __init__(self, name):
-        self.name = name
-        self.children = []
 
 
 def get_all_children(oParent):
@@ -79,9 +89,9 @@ def cardsetview():
     if oCS:
         dCards = {}
         for oCard in oCS.cards:
-            dCards.setdefault(oCard.abstractCard, 0)
-            dCards[oCard.abstractCard] += 1
-        aGrouped = MultiTypeGrouping(dCards.items(), lambda x: x[0])
+            dCards.setdefault(oCard.abstractCard, CardCount(oCard.abstractCard))
+            dCards[oCard.abstractCard].cnt += 1
+        aGrouped = MultiTypeGrouping(dCards.values(), lambda x: x.card)
         return render_template('cardsetview.html', cardset=oCS,
                 grouped=aGrouped)
     else:
