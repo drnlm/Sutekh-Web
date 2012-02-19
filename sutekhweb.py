@@ -100,7 +100,7 @@ def print_card(sCardName):
     if sGrouping:
         sParent = url_for(sSource, grouping=sGrouping)
     elif sCardSet:
-        sParent = url_for(sSource, name=sCardSet)
+        sParent = url_for(sSource, sCardSetName=sCardSet)
     else:
         sParent = ''
     try:
