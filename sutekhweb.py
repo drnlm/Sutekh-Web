@@ -108,7 +108,22 @@ def print_card(sCardName):
     except SQLObjectNotFound:
         oCard = None
     if oCard:
-        return render_template('card.html', card=oCard, parent=sParent)
+        if oCard.text:
+            # We split text into lines, so they can be neatly
+            # formatted by the template
+            aText = oCard.text.split("\n")
+            if '. [' in aText[-1]:
+                # Split discipline level text
+                aSplit = aText.pop().split('. [')
+                # Fix the lines
+                aText.append(aSplit[0] + '.')
+                for sLine in aSplit[1:-1]:
+                    aText.append('[' + sLine + '.')
+                aText.append('[' + aSplit[-1])
+        else:
+            aText = []
+        return render_template('card.html', card=oCard, parent=sParent,
+                text=aText)
     else:
         return render_template('invalid_card.html',
                 type='Card Name',

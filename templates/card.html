@@ -54,8 +54,12 @@
 </ul>
 {% endif %}
 {% if card.text %}
-<h2>Text</h2>
-{{ card.text }}
+<div id="text">
+   <h2>Text</h2>
+   {% for line in text %}
+   <p>{{ line }}</p>
+   {% endfor %}
+</div>
 {% endif %}
 {% endblock %}
 {% block navigation %}
