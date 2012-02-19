@@ -1,5 +1,6 @@
-<!doctype html>
-<title>Error: Invalid {{ type }}</title>
+{% extends "base.html" %}
+{% block title %}Error - Invalid {{ type }}{% endblock %}
+{% block content %}
 <h1>Error: Invalid {{ type }} Specified</h1>
 <h2>Choose an Option</h2>
 <ul>
@@ -11,3 +12,4 @@
 {% if parent %}
 <p><a href="{{ parent }}">Go Back</a></p>
 {% endif %}
+{% endblock %}

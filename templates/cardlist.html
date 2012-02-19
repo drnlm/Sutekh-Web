@@ -1,4 +1,6 @@
-<title>Full Cardlist</title>
+{% extends "base.html" %}
+{% block title %}Full Cardlist{% endblock %}
+{% block content %}
 <h1>The Full Cardlist</h1>
 
 <!-- This should be made prettier -->
@@ -16,4 +18,5 @@
    <li><a href="/cardlist?grouping={{ group }}">{{ group }}</a></li>
    {% endfor %}
 </ul>
+{% endblock %}
 

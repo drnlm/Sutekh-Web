@@ -1,4 +1,6 @@
-<title>Card Set List</title>
+{% extends "base.html" %}
+{% block title %}Card Set List{% endblock %}
+{% block content %}
 <h1>Card Set List</h1>
 <ul>
    {% for tree in cardsets recursive %}
@@ -11,5 +13,4 @@
    {% endif %}
    {% endfor %}
 </ul>
-
-
+{% endblock %}

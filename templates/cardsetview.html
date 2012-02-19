@@ -1,4 +1,6 @@
-<title>{{ cardset.name }}</title>
+{% extends "base.html" %}
+{% block title %}{{ cardset.name }}{% endblock %}
+{% block content %}
 <h1>{{ cardset.name }}</h1>
 {% if cardset.author %}
 <h2>{{ cardset.author }}</h2>
@@ -20,4 +22,4 @@
 <p>{{ item.cnt }} x <a href="/card?name={{ item.card.name }}&source=cardsetview&cardset={{ cardset.name }}">{{ item.card.name }}</a></p>
 {% endfor %}
 {% endfor %}
-
+{% endblock %}

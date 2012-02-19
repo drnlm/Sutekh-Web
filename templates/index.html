@@ -1,6 +1,7 @@
-<!doctype html>
-<title>The Sutekh Web Interface</title>
-<h1>The Sutekh Web Interface</h1>
+{% extends "base.html" %}
+{% block title %}Overview{% endblock %}
+{% block content %}
+<h1>Overview</h1>
 <h2>Choose an Option</h2>
 <ul>
    <li><a href="/cardsets">List Card Sets</a></li>
@@ -8,3 +9,4 @@
    <li><a href="/cardlist?grouping={{ group }}">Browse the cardlist (with {{ group }} grouping)</a></li>
    {% endfor %}
 </ul>
+{% endblock %}

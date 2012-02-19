@@ -1,4 +1,6 @@
-<title>Card Details for {{ card.name }}</title>
+{% extends "base.html" %}
+{% block title %}Card Details for {{ card.name }}{% endblock %}
+{% block content %}
 <h1>{{ card.name }}</h1>
 {% if card.cardtype %}
 <h2>Card Type</h2>
@@ -55,6 +57,9 @@
 <h2>Text</h2>
 {{ card.text }}
 {% endif %}
+{% endblock %}
+{% block navigation %}
 {% if parent %}
 <p><a href="{{ parent }}">Go Back</a></p>
 {% endif %}
+{% endblock %}

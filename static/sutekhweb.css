@@ -1,0 +1,34 @@
+/*
+
+Sutekh Web CSS Style
+   Neil Muller <drnlmuller+sutekh@gmail.com>
+
+*/
+
+body {
+   font-family: luxi sans, trebuchet ms, sans-serif;
+   color: #888;
+   margin: 12px;
+   background-color: #3c3c3c;
+}
+
+#title {
+   color: #bbb;
+   font-weight: bold;
+   margin: 0;
+   padding: 0;
+   margin-left: 3px;
+   font-size: large;
+   letter-spacing: .5em;
+}
+
+div.navigation {
+   float: right;
+   text-align: right;
+   margin-top: 3px;
+}
+
+a {
+   text-decoration: none;
+   color: #c49200;
+}
