@@ -47,6 +47,14 @@ class CardCount(object):
         self.cnt = 0
 
 
+# default config
+class DefConfig(object):
+    DEBUG = False
+    LISTEN = '0.0.0.0'
+    SUTEKH_PREFS = prefs_dir("Sutekh")
+    DATABASE_URI = sqlite_uri(os.path.join(SUTEKH_PREFS, "sutekh.db"))
+    ICONS = False
+
 
 @app.route('/')
 def start():
@@ -147,20 +155,18 @@ def cardlist():
             groupby=sGroup)
 
 
-# FIXME: Add proper argument passing
-
 if __name__ == "__main__":
-    sPrefsDir = prefs_dir("Sutekh")
-    sUri = sqlite_uri(os.path.join(sPrefsDir, "sutekh.db"))
-    oConn = connectionForURI(sUri)
-    sqlhub.processConnection = oConn
-    bDebug = False
+    app.config.from_object(DefConfig)
     try:
-        if sys.argv[1] == '--debug':
-            bDebug = True
-    except IndexError:
-        bDebug = False
+        app.config.from_envvar('SUTEKH_WEB_CONFIG')
+    except RuntimeError:
+        # We don't require the env be set, so ignore
+        # this runtime error
+        pass
+    oConn = connectionForURI(app.config['DATABASE_URI'])
+    sqlhub.processConnection = oConn
+    bDebug = app.config['DEBUG']
     if bDebug:
-        app.run(debug=True)
+        app.run()
     else:
-        app.run(host='0.0.0.0')
+        app.run(host=app.config['LISTEN'])
