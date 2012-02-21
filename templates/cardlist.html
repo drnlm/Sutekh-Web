@@ -8,15 +8,15 @@
 {% for group, cards in grouped %}
 <h2>{{ group }}</h2>
 {% for card in cards %}
-<p><a href="/card/{{ card.name }}?source=cardlist&grouping={{ groupby }}">{{ card.name }}</a></p>
+<p><a href="/card/{{ card.name }}">{{ card.name }}</a></p>
 {% endfor %}
 {% endfor %}
 
-<h2>Navigation</h2>
-<ul>
-   {% for group in groupings %}
-   <li><a href="/cardlist?grouping={{ group }}">{{ group }}</a></li>
-   {% endfor %}
-</ul>
+{% endblock %}
+{% block navigation %}
+<form action="{{ url_for('cardlist') }}" method=post>
+   <input type="submit" name="grouping" value="Change Grouping">
+   <input type="submit" name="filter" value="Specify Filter">
+</form>
 {% endblock %}
 

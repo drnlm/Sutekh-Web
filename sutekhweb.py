@@ -5,12 +5,10 @@
 
 """The main web-app"""
 
-from flask import Flask, render_template, request, url_for
+from flask import Flask, render_template, request, url_for, redirect
 app = Flask(__name__)
 
 import os
-import sys
-import urllib
 
 from sqlobject import sqlhub, connectionForURI, SQLObjectNotFound
 from sutekh.core.SutekhObjects import AbstractCard, IAbstractCard, \
@@ -61,7 +59,6 @@ def start():
     return render_template('index.html', groupings=sorted(ALLOWED_GROUPINGS))
 
 
-
 def get_all_children(oParent):
     aResult = []
     for oCS in sorted(find_children(oParent), key=lambda x: x.name):
@@ -79,24 +76,35 @@ def cardsets():
     return render_template('cardsets.html', cardsets=aCardSets)
 
 
-@app.route('/cardsetview/<sCardSetName>')
-def cardsetview(sCardSetName):
-    try:
-        oCS = IPhysicalCardSet(sCardSetName)
-    except SQLObjectNotFound:
-        oCS = None
-    if oCS:
-        dCards = {}
-        for oCard in oCS.cards:
-            dCards.setdefault(oCard.abstractCard, CardCount(oCard.abstractCard))
-            dCards[oCard.abstractCard].cnt += 1
-        aGrouped = MultiTypeGrouping(dCards.values(), lambda x: x.card)
-        return render_template('cardsetview.html', cardset=oCS,
-                grouped=aGrouped)
-    else:
-        return render_template('invalid.html', type='Card Set Name',
-                groupings=sorted(ALLOWED_GROUPINGS),
-                parent=None)
+@app.route('/cardsetview/<sCardSetName>', methods=['GET', 'POST'])
+@app.route('/cardsetview/<sCardSetName>/<sGrouping>', methods=['GET', 'POST'])
+def cardsetview(sCardSetName, sGrouping=None):
+    if request.method == 'POST':
+        # Form submission
+        if 'grouping' in request.form:
+            return redirect(url_for('change_grouping', source='cardsetview',
+                cardsetname=sCardSetName))
+        elif 'filter' in request.form:
+            print 'TODO Item: Implement filters'
+    elif request.method == 'GET':
+        try:
+            oCS = IPhysicalCardSet(sCardSetName)
+        except SQLObjectNotFound:
+            oCS = None
+        if oCS:
+            dCards = {}
+            for oCard in oCS.cards:
+                dCards.setdefault(oCard.abstractCard,
+                        CardCount(oCard.abstractCard))
+                dCards[oCard.abstractCard].cnt += 1
+            cGrouping = ALLOWED_GROUPINGS.get(sGrouping, CardTypeGrouping)
+            aGrouped = cGrouping(dCards.values(), lambda x: x.card)
+            return render_template('cardsetview.html', cardset=oCS,
+                    grouped=aGrouped)
+        else:
+            return render_template('invalid.html', type='Card Set Name',
+                    groupings=sorted(ALLOWED_GROUPINGS),
+                    parent=None)
 
 
 @app.route('/card/<sCardName>')
@@ -144,11 +152,44 @@ def print_card(sCardName):
                 parent=sParent)
 
 
-@app.route('/cardlist')
-def cardlist():
+@app.route('/grouping', methods=['GET', 'POST'])
+def change_grouping():
+    """Handle changing the grouping"""
+    if request.method == 'GET':
+        sSource = request.args.get('source', 'cardlist')
+        sCardSet = request.args.get('cardsetname', '')
+        print sSource, sCardSet
+        return render_template('grouping.html',
+                groupings=sorted(ALLOWED_GROUPINGS), source=sSource,
+                cardsetname=sCardSet)
+    elif request.method == 'POST':
+        sNewGrouping = request.form['grouping']
+        sSource = request.form['source']
+        if sSource == 'cardlist':
+            return redirect(url_for(sSource, sGrouping=sNewGrouping))
+        else:
+            sCardSet = request.form['cardset']
+            return redirect(url_for(sSource, sCardSetName=sCardSet,
+                sGrouping=sNewGrouping))
+    else:
+        print 'Error, fell off the back of the world'
+
+
+@app.route('/cardlist', methods=['GET', 'POST'])
+@app.route('/cardlist/<sGrouping>', methods=['GET', 'POST'])
+def cardlist(sGrouping=None):
     """List the WW cardlist"""
-    sGroup = request.args.get('grouping', 'Card Type')
-    cGrouping = ALLOWED_GROUPINGS.get(sGroup, CardTypeGrouping)
+    if request.method == 'POST':
+        # Form submission
+        if 'grouping' in request.form:
+            return redirect(url_for('change_grouping', source='cardlist'))
+        elif 'filter' in request.form:
+            print 'TODO Item: Implement filters'
+    if sGrouping is None:
+        sGroup = 'Card Type'
+    else:
+        sGroup = sGrouping
+    cGrouping = ALLOWED_GROUPINGS.get(sGrouping, CardTypeGrouping)
     aGrpData = cGrouping(AbstractCard.select(), IAbstractCard)
     return render_template('cardlist.html', grouped=aGrpData,
             groupings=sorted(ALLOWED_GROUPINGS),

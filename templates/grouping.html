@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Choose Grouping{% endblock %}
+{% block content %}
+<h1>Choose the Grouping</h1>
+<form action="{{ url_for('change_grouping') }}" method=post>
+   <dl>
+      {% for group in groupings %}
+      <input type="radio" value="{{ group }}" name="grouping" >{{ group }} Grouping</input>
+      {% endfor %}
+   </dl>
+   <!-- Should this be done via session stuff? -->
+   <input type="hidden" name="source" value="{{ source }}">
+   <input type="hidden" name="cardset" value="{{ cardsetname }}">
+   <input type="submit" name="dogroup" value="Change Grouping">
+</form>
+{% endblock %}
