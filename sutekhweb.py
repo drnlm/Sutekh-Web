@@ -102,23 +102,12 @@ def cardsetview(sCardSetName, sGrouping=None):
             return render_template('cardsetview.html', cardset=oCS,
                     grouped=aGrouped)
         else:
-            return render_template('invalid.html', type='Card Set Name',
-                    groupings=sorted(ALLOWED_GROUPINGS),
-                    parent=None)
+            return render_template('invalid.html', type='Card Set Name')
 
 
 @app.route('/card/<sCardName>')
 def print_card(sCardName):
     """Display card details"""
-    sSource = request.args.get('source', None)
-    sGrouping = request.args.get('grouping', None)
-    sCardSet = request.args.get('cardset', None)
-    if sGrouping:
-        sParent = url_for(sSource, grouping=sGrouping)
-    elif sCardSet:
-        sParent = url_for(sSource, sCardSetName=sCardSet)
-    else:
-        sParent = ''
     try:
         oCard = IAbstractCard(sCardName)
     except SQLObjectNotFound:
@@ -143,13 +132,9 @@ def print_card(sCardName):
                 aText.append('[' + aSplit[-1])
         else:
             aText = []
-        return render_template('card.html', card=oCard, parent=sParent,
-                text=aText)
+        return render_template('card.html', card=oCard, text=aText)
     else:
-        return render_template('invalid_card.html',
-                type='Card Name',
-                groupings=sorted(ALLOWED_GROUPINGS),
-                parent=sParent)
+        return render_template('invalid.html', type='Card Name')
 
 
 @app.route('/grouping', methods=['GET', 'POST'])

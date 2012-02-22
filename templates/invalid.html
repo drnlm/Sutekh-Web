@@ -5,11 +5,7 @@
 <h2>Choose an Option</h2>
 <ul>
    <li><a href="/cardsets">List Card Sets</a></li>
-   {% for group in groupings %}
-   <li><a href="/cardlist?grouping={{ group }}">Browse the cardlist (with {{ group }} grouping)</a></li>
-   {% endfor %}
+   <li><a href="/cardlist">Browse the cardlist</a></li>
+   <li>Return to <a href="/">Main page</a></li>
 </ul>
-{% if parent %}
-<p><a href="{{ parent }}">Go Back</a></p>
-{% endif %}
 {% endblock %}
