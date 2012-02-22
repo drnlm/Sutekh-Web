@@ -23,7 +23,7 @@
 {% endfor %}
 {% endfor %}
 {% endblock %}
-{% block navigation %}
+{% block buttons %}
 <form action="{{ url_for('cardsetview', sCardSetName=cardset.name) }}" method=post>
    <input type="submit" name="grouping" value="Change Grouping">
    <input type="submit" name="filter" value="Specify Filter">

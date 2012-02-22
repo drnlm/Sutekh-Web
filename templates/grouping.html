@@ -3,12 +3,12 @@
 {% block content %}
 <h1>Choose the Grouping</h1>
 <form action="{{ url_for('change_grouping') }}" method=post>
-   <dl>
       {% for group in groupings %}
-      <input type="radio" value="{{ group }}" name="grouping" >{{ group }} Grouping</input>
+      <p><input type="radio" value="{{ group }}" name="grouping" >{{ group }} Grouping</input></p>
       {% endfor %}
-   </dl>
-   <!-- Should this be done via session stuff? -->
+      <!-- Should this be done via session stuff? -->
+{% endblock %}
+{% block buttons %}
    <input type="hidden" name="source" value="{{ source }}">
    <input type="hidden" name="cardset" value="{{ cardsetname }}">
    <input type="submit" name="dogroup" value="Change Grouping">

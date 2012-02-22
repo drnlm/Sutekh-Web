@@ -37,6 +37,11 @@ span.errata {
    color: #f88;
 }
 
+div#buttons {
+   margin-top: 5px;
+   margin-bottom: 5px;
+}
+
 div#navigation {
    float: right;
    text-align: right;
