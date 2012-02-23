@@ -143,7 +143,6 @@ def change_grouping():
     if request.method == 'GET':
         sSource = request.args.get('source', 'cardlist')
         sCardSet = request.args.get('cardsetname', '')
-        print sSource, sCardSet
         return render_template('grouping.html',
                 groupings=sorted(ALLOWED_GROUPINGS), source=sSource,
                 cardsetname=sCardSet)
