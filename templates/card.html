@@ -5,8 +5,12 @@
 {% if card.cardtype %}
 <h2>Card Type</h2>
 <ul>
-   {% for type in card.cardtype %}
-   <li>{{ type.name }}
+   {% for item in card.cardtype %}
+   {% if item.name in icons %}
+   <li><img src="{{ icons[item.name] }}" width=25>{{ item.name }}</li>
+   {% else %}
+   <li>{{ item.name }}</li>
+   {% endif %}
    {% endfor %}
 </ul>
 {% endif %}
@@ -14,7 +18,11 @@
 <h2>Keywords</h2>
 <ul>
    {% for item in card.keywords %}
+   {% if item.keyword in icons and icons[item.keyword] %}
+   <li><img src="{{ icons[item.keyword] }}" width=25>{{ item.keyword }}</li>
+   {% else %}
    <li>{{ item.keyword }}</li>
+   {% endif %}
    {% endfor %}
 </ul>
 {% endif %}
@@ -22,7 +30,11 @@
 <h2>Clan</h2>
 <ul>
    {% for item in card.clan %}
+   {% if item.name in icons %}
+   <li><img src="{{ icons[item.name] }}" width=25>{{ item.name }}</li>
+   {% else %}
    <li>{{ item.name }}</li>
+   {% endif %}
    {% endfor %}
 </ul>
 {% endif %}
@@ -30,7 +42,11 @@
 <h2>Creed</h2>
 <ul>
    {% for item in card.creed %}
+   {% if item.name in icons %}
+   <li><img src="{{ icons[item.name] }}" width=25>{{ item.name }}</li>
+   {% else %}
    <li>{{ item.name }}</li>
+   {% endif %}
    {% endfor %}
 </ul>
 {% endif %}
@@ -38,7 +54,11 @@
 <h2>Virtues</h2>
 <ul>
    {% for item in card.virtue %}
+   {% if item.name in icons %}
+   <li><img src="{{ icons[item.name] }}" width=25>{{ item.name }}</li>
+   {% else %}
    <li>{{ item.name }}</li>
+   {% endif %}
    {% endfor %}
 </ul>
 {% endif %}
@@ -46,10 +66,18 @@
 <h2>Disciplines</h2>
 <ul>
    {% for item in card.discipline|sort(attribute='discipline.name') if item.level != 'superior' %}
+   {% if item.discipline.name|lower in icons %}
+   <li><img src="{{ icons[item.discipline.name|lower] }}" width=20>{{ item.discipline.name|lower }}</li>
+   {% else %}
    <li>{{ item.discipline.name|lower }}</li>
+   {% endif %}
    {% endfor %}
    {% for item in card.discipline|sort(attribute='discipline.name') if item.level == 'superior' %}
+   {% if item.discipline.name|lower in icons %}
+   <li><img src="{{ icons[item.discipline.name|lower] }}" width=22>{{ item.discipline.name|upper }}</li>
+   {% else %}
    <li>{{ item.discipline.name|upper }}</li>
+   {% endif %}
    {% endfor %}
 </ul>
 {% endif %}

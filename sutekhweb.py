@@ -12,11 +12,12 @@ import os
 
 from sqlobject import sqlhub, connectionForURI, SQLObjectNotFound
 from sutekh.core.SutekhObjects import AbstractCard, IAbstractCard, \
-        IPhysicalCardSet
+        IPhysicalCardSet, IKeyword
 from sutekh.core.Groupings import MultiTypeGrouping, ClanGrouping, \
         NullGrouping, GroupGrouping, CryptLibraryGrouping, CardTypeGrouping
 from sutekh.SutekhUtility import sqlite_uri, prefs_dir
 from sutekh.core.CardSetUtilities import find_children, has_children
+from sutekh.io.IconManager import IconManager
 
 
 ALLOWED_GROUPINGS = {
@@ -43,6 +44,45 @@ class CardCount(object):
     def __init__(self, oCard):
         self.card = oCard
         self.cnt = 0
+
+
+class WebIconManager(IconManager):
+
+    def _get_icon(self, sFileName, _iSize=12):
+        if sFileName:
+            return url_for('static',
+                    filename='/'.join((self._sPrefsDir, sFileName)))
+        return None
+
+    def get_all_icons(self, oCard):
+        """Returns a dictionarty of all the icons appropriate for
+           the given card"""
+        dIcons = {}
+        if oCard.cardtype:
+            dIcons.update(self._get_card_type_icons(oCard.cardtype))
+        if oCard.creed:
+            dIcons.update(self._get_creed_icons(oCard.creed))
+        if oCard.clan:
+            dIcons.update(self._get_clan_icons(oCard.clan))
+        if oCard.discipline:
+            dIcons.update(self._get_discipline_icons(oCard.discipline))
+        if oCard.virtue:
+            dIcons.update(self._get_virtue_icons(oCard.virtue))
+        if oCard.virtue:
+            dIcons.update(self._get_virtue_icons(oCard.virtue))
+        for oItem in oCard.keywords:
+            if oItem == IKeyword('burn option'):
+                dIcons.update({oItem.keyword:
+                    self.get_icon_by_name('burn option')})
+            elif oItem == IKeyword('advanced'):
+                dIcons.update({oItem.keyword:
+                    self.get_icon_by_name('advanced')})
+        return dIcons
+
+
+# Icon Manager is global, so we don't have to keep creating it
+# icon path isn't currently configurable, although it should be
+ICON_MANAGER = WebIconManager('icons')
 
 
 # default config
@@ -132,7 +172,13 @@ def print_card(sCardName):
                 aText.append('[' + aSplit[-1])
         else:
             aText = []
-        return render_template('card.html', card=oCard, text=aText)
+        if app.config['ICONS']:
+            # Extract icons
+            dIcons = ICON_MANAGER.get_all_icons(oCard)
+        else:
+            dIcons = None
+        return render_template('card.html', card=oCard, text=aText,
+                icons=dIcons)
     else:
         return render_template('invalid.html', type='Card Name')
 
