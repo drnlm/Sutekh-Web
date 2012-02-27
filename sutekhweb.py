@@ -243,16 +243,26 @@ def cardlist(sGrouping=None):
             groupby=sGroup)
 
 @app.route('/search', methods=['GET', 'POST'])
-def simple_search():
+@app.route('/search/<sType>', methods=['GET', 'POST'])
+def simple_search(sType='Card Name'):
     """Allow searching on Card Name"""
     if request.method == 'POST':
-        if 'name' in request.form:
-            sFilter = 'CardName = "%s"' % request.form['name']
+        if 'searchtext' in request.form:
+            if sType == "Card Name":
+                sFilter = 'CardName = "%s"' % request.form['searchtext']
+            elif sType == "Card Text":
+                sFilter = 'CardText = "%s"' % request.form['searchtext']
+            else:
+                return render_template('invalid.html', type='Search Type',
+                        requested=sType)
             return redirect(url_for('cardlist', filter=sFilter))
         else:
             return redirect(url_for('cardlist'))
     else:
-        return render_template('simple_search.html')
+        if sType in ['Card Name', 'Card Text']:
+            return render_template('simple_search.html', type=sType)
+        return render_template('invalid.html', type='Search Type',
+                requested=sType)
 
 
 if __name__ == "__main__":
