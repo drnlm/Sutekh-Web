@@ -136,7 +136,8 @@ def cardsetview(sCardSetName, sGrouping=None):
             return redirect(url_for('change_grouping', source='cardsetview',
                 cardsetname=sCardSetName))
         elif 'filter' in request.form:
-            print 'TODO Item: Implement filters'
+            return redirect(url_for('filter', source='cardsetview',
+                cardsetname=sCardSetName))
     elif request.method == 'GET':
         try:
             oCS = IPhysicalCardSet(sCorrectName)
@@ -232,7 +233,7 @@ def cardlist(sGrouping=None):
         if 'grouping' in request.form:
             return redirect(url_for('change_grouping', source='cardlist'))
         elif 'filter' in request.form:
-            print 'TODO Item: Implement filters'
+            return redirect(url_for('filter', source='cardlist'))
     if sGrouping is None:
         sGroup = 'Card Type'
     else:
@@ -247,6 +248,7 @@ def cardlist(sGrouping=None):
     return render_template('cardlist.html', grouped=aGrpData,
             groupings=sorted(ALLOWED_GROUPINGS),
             groupby=sGroup)
+
 
 @app.route('/search', methods=['GET', 'POST'])
 @app.route('/search/<sType>', methods=['GET', 'POST'])
@@ -269,6 +271,11 @@ def simple_search(sType='Card Name'):
             return render_template('simple_search.html', type=sType)
         return render_template('invalid.html', type='Search Type',
                 requested=sType)
+
+
+@app.route('/filter')
+def filter():
+    return render_template('filter.html')
 
 
 if __name__ == "__main__":
