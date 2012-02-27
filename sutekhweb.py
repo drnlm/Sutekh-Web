@@ -9,6 +9,7 @@ from flask import Flask, render_template, request, url_for, redirect
 app = Flask(__name__)
 
 import os
+import urllib
 
 from sqlobject import sqlhub, connectionForURI, SQLObjectNotFound
 from sutekh.core.SutekhObjects import AbstractCard, IAbstractCard, \
@@ -36,6 +37,10 @@ class CardSetTree(object):
 
     def __init__(self, sName):
         self.name = sName
+        # We double quote this, so we can handle /'s in the name
+        # The double quoting is ugly, but gets us past flask's
+        # unquoting before calling the function.
+        self.linkname = urllib.quote(urllib.quote(sName, safe=''))
         self.children = []
 
 
@@ -119,6 +124,7 @@ def cardsets():
 @app.route('/cardsetview/<sCardSetName>', methods=['GET', 'POST'])
 @app.route('/cardsetview/<sCardSetName>/<sGrouping>', methods=['GET', 'POST'])
 def cardsetview(sCardSetName, sGrouping=None):
+    sCorrectName = urllib.unquote(sCardSetName)
     if request.method == 'POST':
         # Form submission
         if 'grouping' in request.form:
@@ -128,7 +134,7 @@ def cardsetview(sCardSetName, sGrouping=None):
             print 'TODO Item: Implement filters'
     elif request.method == 'GET':
         try:
-            oCS = IPhysicalCardSet(sCardSetName)
+            oCS = IPhysicalCardSet(sCorrectName)
         except SQLObjectNotFound:
             oCS = None
         if oCS:

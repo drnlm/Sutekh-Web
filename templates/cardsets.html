@@ -4,8 +4,7 @@
 <h1>Card Set List</h1>
 <ul>
    {% for tree in cardsets recursive %}
-   <!-- FIXME: This has issues if the card set name contains & -->
-   <li><a href="cardsetview/{{ tree.name }}">{{ tree.name }}</a></li>
+   <li><a href="cardsetview/{{ tree.linkname }}">{{ tree.name }}</a></li>
    {% if tree.children %}
    <ul>
       {{ loop(tree.children) }}
