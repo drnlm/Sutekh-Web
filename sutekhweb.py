@@ -142,7 +142,8 @@ def cardsetview(sCardSetName, sGrouping=None):
             return render_template('cardsetview.html', cardset=oCS,
                     grouped=aGrouped)
         else:
-            return render_template('invalid.html', type='Card Set Name')
+            return render_template('invalid.html', type='Card Set Name',
+                    requested=sCardSetName)
 
 
 @app.route('/card/<sCardName>')
@@ -180,7 +181,8 @@ def print_card(sCardName):
         return render_template('card.html', card=oCard, text=aText,
                 icons=dIcons)
     else:
-        return render_template('invalid.html', type='Card Name')
+        return render_template('invalid.html', type='Card Name',
+                requested=sCardName)
 
 
 @app.route('/grouping', methods=['GET', 'POST'])
