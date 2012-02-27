@@ -37,8 +37,9 @@ ALLOWED_GROUPINGS = {
 class CardSetTree(object):
     """object used to build up card set trees for the jinja template"""
 
-    def __init__(self, sName):
+    def __init__(self, sName, bInUse):
         self.name = sName
+        self.inuse = bInUse
         # We double quote this, so we can handle /'s in the name
         # The double quoting is ugly, but gets us past flask's
         # unquoting before calling the function.
@@ -111,7 +112,7 @@ def start():
 def get_all_children(oParent):
     aResult = []
     for oCS in sorted(find_children(oParent), key=lambda x: x.name):
-        oTree = CardSetTree(oCS.name)
+        oTree = CardSetTree(oCS.name, oCS.inuse)
         aResult.append(oTree)
         if has_children(oCS):
             oTree.children = get_all_children(oCS)

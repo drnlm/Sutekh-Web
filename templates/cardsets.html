@@ -4,7 +4,11 @@
 <h1>Card Set List</h1>
 <ul>
    {% for tree in cardsets recursive %}
+   {% if tree.inuse %}
+   <li><a href="cardsetview/{{ tree.linkname }}"><strong>{{ tree.name }}</strong></a></li>
+   {% else %}
    <li><a href="cardsetview/{{ tree.linkname }}">{{ tree.name }}</a></li>
+   {% endif %}
    {% if tree.children %}
    <ul>
       {{ loop(tree.children) }}
