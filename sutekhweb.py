@@ -14,6 +14,8 @@ import urllib
 from sqlobject import sqlhub, connectionForURI, SQLObjectNotFound
 from sutekh.core.SutekhObjects import AbstractCard, IAbstractCard, \
         IPhysicalCardSet, IKeyword
+from sutekh.core.FilterParser import FilterParser
+from sutekh.core.Filters import NullFilter
 from sutekh.core.Groupings import MultiTypeGrouping, ClanGrouping, \
         NullGrouping, GroupGrouping, CryptLibraryGrouping, CardTypeGrouping
 from sutekh.SutekhUtility import sqlite_uri, prefs_dir
@@ -88,6 +90,8 @@ class WebIconManager(IconManager):
 # Icon Manager is global, so we don't have to keep creating it
 # icon path isn't currently configurable, although it should be
 ICON_MANAGER = WebIconManager('icons')
+# Likewise for the Filter Parser
+PARSER = FilterParser()
 
 
 # default config
@@ -227,11 +231,28 @@ def cardlist(sGrouping=None):
         sGroup = 'Card Type'
     else:
         sGroup = sGrouping
+    sFilter = request. args.get('filter', None)
+    if sFilter:
+        oFilter = PARSER.apply(sFilter).get_filter()
+    else:
+        oFilter = NullFilter()
     cGrouping = ALLOWED_GROUPINGS.get(sGrouping, CardTypeGrouping)
-    aGrpData = cGrouping(AbstractCard.select(), IAbstractCard)
+    aGrpData = cGrouping(oFilter.select(AbstractCard), IAbstractCard)
     return render_template('cardlist.html', grouped=aGrpData,
             groupings=sorted(ALLOWED_GROUPINGS),
             groupby=sGroup)
+
+@app.route('/search', methods=['GET', 'POST'])
+def simple_search():
+    """Allow searching on Card Name"""
+    if request.method == 'POST':
+        if 'name' in request.form:
+            sFilter = 'CardName = "%s"' % request.form['name']
+            return redirect(url_for('cardlist', filter=sFilter))
+        else:
+            return redirect(url_for('cardlist'))
+    else:
+        return render_template('simple_search.html')
 
 
 if __name__ == "__main__":

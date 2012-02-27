@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Search vy Card Name{% endblock %}
+{% block content %}
+<h1>Search by Card Name</h1>
+<form action="{{ url_for('simple_search') }}" method=post>
+   <input type="text" name="name" value="Search Text">
+{% endblock %}
+{% block buttons %}
+   <input type="submit" name="search" value="Search CardList">
+</form>
+{% endblock %}
