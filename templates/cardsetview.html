@@ -14,10 +14,13 @@
 <p>{{ cardset.annotations }}</p>
 {% endif %}
 
+<h2>Details</h2>
+<p>{{ counts['library'] }} Library cards, {{ counts['crypt'] }} crypt cards</p>
+
 <!-- This should be made prettier -->
 
 {% for group, cards in grouped %}
-<h2>{{ group }}</h2>
+<h3>{{ group }}</h3>
 {% for item in cards|sort(attribute='card.name') %}
 <p>{{ item.cnt }} x <a href="/card/{{ item.card.name }}">{{ item.card.name }}</a></p>
 {% endfor %}

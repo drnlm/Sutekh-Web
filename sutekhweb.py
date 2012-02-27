@@ -18,7 +18,7 @@ from sutekh.core.FilterParser import FilterParser
 from sutekh.core.Filters import NullFilter
 from sutekh.core.Groupings import MultiTypeGrouping, ClanGrouping, \
         NullGrouping, GroupGrouping, CryptLibraryGrouping, CardTypeGrouping
-from sutekh.SutekhUtility import sqlite_uri, prefs_dir
+from sutekh.SutekhUtility import sqlite_uri, prefs_dir, is_crypt_card
 from sutekh.core.CardSetUtilities import find_children, has_children
 from sutekh.io.IconManager import IconManager
 
@@ -143,14 +143,19 @@ def cardsetview(sCardSetName, sGrouping=None):
             oCS = None
         if oCS:
             dCards = {}
+            dCounts = {'crypt': 0, 'library': 0}
             for oCard in oCS.cards:
                 dCards.setdefault(oCard.abstractCard,
                         CardCount(oCard.abstractCard))
                 dCards[oCard.abstractCard].cnt += 1
+                if is_crypt_card(oCard.abstractCard):
+                    dCounts['crypt'] += 1
+                else:
+                    dCounts['library'] += 1
             cGrouping = ALLOWED_GROUPINGS.get(sGrouping, CardTypeGrouping)
             aGrouped = cGrouping(dCards.values(), lambda x: x.card)
             return render_template('cardsetview.html', cardset=oCS,
-                    grouped=aGrouped)
+                    grouped=aGrouped, counts=dCounts)
         else:
             return render_template('invalid.html', type='Card Set Name',
                     requested=sCardSetName)
