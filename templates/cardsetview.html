@@ -15,7 +15,7 @@
 {% endif %}
 
 <h2>Details</h2>
-<p>{{ counts['library'] }} Library cards, {{ counts['crypt'] }} crypt cards</p>
+<p>{{ counts['library'] }} Library cards, {{ counts['crypt'] }} crypt cards, {{ counts['crypt'] + counts['library'] }} Total Cards</p>
 
 {% if cardset.inuse %}
 <p>Card Set is current marked as <strong>In Use</strong></p>
