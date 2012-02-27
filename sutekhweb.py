@@ -33,17 +33,22 @@ ALLOWED_GROUPINGS = {
         }
 
 
-# Utility classes for passing info the jinja2 easily
+# Utility classes and functions for passing info the jinja2 easily
+def double_quote(sString):
+    """Double quote a string with urllib.quote, including / as a quoted
+       character.
+
+       Needed to bypass flask's unquoting in some cases."""
+    return urllib.quote(urllib.quote(sString, safe=''))
+
+
 class CardSetTree(object):
     """object used to build up card set trees for the jinja template"""
 
     def __init__(self, sName, bInUse):
         self.name = sName
         self.inuse = bInUse
-        # We double quote this, so we can handle /'s in the name
-        # The double quoting is ugly, but gets us past flask's
-        # unquoting before calling the function.
-        self.linkname = urllib.quote(urllib.quote(sName, safe=''))
+        self.linkname = double_quote(sName)
         self.children = []
 
 
@@ -157,7 +162,8 @@ def cardsetview(sCardSetName, sGrouping=None):
             cGrouping = ALLOWED_GROUPINGS.get(sGrouping, CardTypeGrouping)
             aGrouped = cGrouping(dCards.values(), lambda x: x.card)
             return render_template('cardsetview.html', cardset=oCS,
-                    grouped=aGrouped, counts=dCounts)
+                    grouped=aGrouped, counts=dCounts,
+                    quotedname=urllib.quote(oCS.name, safe=''))
         else:
             return render_template('invalid.html', type='Card Set Name',
                     requested=sCardSetName)
