@@ -201,8 +201,18 @@ def print_card(sCardName):
             dIcons = ICON_MANAGER.get_all_icons(oCard)
         else:
             dIcons = {}
+        if oCard.rarity:
+            dExp = {}
+            for oPair in oCard.rarity:
+                dExp.setdefault(oPair.expansion.name, [])
+                dExp[oPair.expansion.name].append(oPair.rarity.name)
+            # Create the sorted display list
+            aExpansions = [(x, ", ".join(sorted(dExp[x])))
+                    for x in sorted(dExp)]
+        else:
+            aExpansions = []
         return render_template('card.html', card=oCard, text=aText,
-                icons=dIcons)
+                icons=dIcons, expansions=aExpansions)
     else:
         return render_template('invalid.html', type='Card Name',
                 requested=sCardName)

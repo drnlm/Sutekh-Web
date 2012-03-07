@@ -102,6 +102,16 @@
    {% endfor %}
 </div>
 {% endif %}
+{% if card.rarity %}
+<div id="expansions">
+   <h2>Expansions</h2>
+   <ul>
+      {% for exp_name, rarities in expansions %}
+      <li>{{ exp_name }} ({{ rarities }})</li>
+      {% endfor %}
+   </ul>
+</div>
+{% endif %}
 {% if card.artists %}
 <div id="artists">
    <h2>Artists</h2>
