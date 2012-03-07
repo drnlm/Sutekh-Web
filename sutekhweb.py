@@ -200,7 +200,7 @@ def print_card(sCardName):
             # Extract icons
             dIcons = ICON_MANAGER.get_all_icons(oCard)
         else:
-            dIcons = None
+            dIcons = {}
         return render_template('card.html', card=oCard, text=aText,
                 icons=dIcons)
     else:
