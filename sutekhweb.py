@@ -212,7 +212,7 @@ def print_card(sCardName):
         else:
             aExpansions = []
         if oCard.rulings:
-            aRulings = [oR.text.replace("\n", " ") + " " + oR.code
+            aRulings = [(oR.text.replace("\n", " "), oR.code, oR.url)
                     for oR in oCard.rulings]
         else:
             aRulings = []

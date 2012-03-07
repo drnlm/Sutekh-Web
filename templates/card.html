@@ -126,8 +126,12 @@
 <div id="rulings">
    <h2>Rulings</h2>
    <ul>
-      {% for line in rulings %}
-      <li>{{ line }}</li>
+      {% for text, code, ruleurl  in rulings %}
+      {% if ruleurl %}
+      <li>{{ text }} <a href="{{ ruleurl }}">{{ code }}</a></li>
+      {% else %}
+      <li>{{ text }} {{ code }}</li>
+      {% endif %}
       {% endfor %}
    </ul>
 </div>
