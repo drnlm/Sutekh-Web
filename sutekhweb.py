@@ -211,8 +211,14 @@ def print_card(sCardName):
                     for x in sorted(dExp)]
         else:
             aExpansions = []
+        if oCard.rulings:
+            aRulings = [oR.text.replace("\n", " ") + " " + oR.code
+                    for oR in oCard.rulings]
+        else:
+            aRulings = []
         return render_template('card.html', card=oCard, text=aText,
-                icons=dIcons, expansions=aExpansions)
+                icons=dIcons, expansions=aExpansions,
+                rulings=aRulings)
     else:
         return render_template('invalid.html', type='Card Name',
                 requested=sCardName)

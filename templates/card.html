@@ -122,6 +122,16 @@
    </ul>
 </div>
 {% endif %}
+{% if rulings %}
+<div id="rulings">
+   <h2>Rulings</h2>
+   <ul>
+      {% for line in rulings %}
+      <li>{{ line }}</li>
+      {% endfor %}
+   </ul>
+</div>
+{% endif %}
 {% endblock %}
 {% block navigation %}
 <p>Return to <a href="/">Main page</a></p>
