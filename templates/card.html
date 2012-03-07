@@ -105,9 +105,11 @@
 {% if card.artists %}
 <div id="artists">
    <h2>Artists</h2>
-   {% for artist in card.artists %}
-   <p>{{ artist.name }}</p>
-   {% endfor %}
+   <ul>
+      {% for artist in card.artists %}
+      <li>{{ artist.name }}</li>
+      {% endfor %}
+   </ul>
 </div>
 {% endif %}
 {% endblock %}
