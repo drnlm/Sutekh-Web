@@ -3,83 +3,95 @@
 {% block content %}
 <h1>{{ card.name }}</h1>
 {% if card.cardtype %}
-<h2>Card Type</h2>
-<ul>
-   {% for item in card.cardtype %}
-   {% if item.name in icons %}
-   <li><img src="{{ icons[item.name] }}" width=25>{{ item.name }}</li>
-   {% else %}
-   <li>{{ item.name }}</li>
-   {% endif %}
-   {% endfor %}
-</ul>
+<div id="cardtype">
+   <h2>Card Type</h2>
+   <ul>
+      {% for item in card.cardtype %}
+      {% if item.name in icons %}
+      <li><img src="{{ icons[item.name] }}" width=25>{{ item.name }}</li>
+      {% else %}
+      <li>{{ item.name }}</li>
+      {% endif %}
+      {% endfor %}
+   </ul>
+</div>
 {% endif %}
 {% if card.keywords %}
-<h2>Keywords</h2>
-<ul>
-   {% for item in card.keywords %}
-   {% if item.keyword in icons and icons[item.keyword] %}
-   <li><img src="{{ icons[item.keyword] }}" width=25>{{ item.keyword }}</li>
-   {% else %}
-   <li>{{ item.keyword }}</li>
-   {% endif %}
-   {% endfor %}
-</ul>
+<div id="keyword">
+   <h2>Keywords</h2>
+   <ul>
+      {% for item in card.keywords %}
+      {% if item.keyword in icons and icons[item.keyword] %}
+      <li><img src="{{ icons[item.keyword] }}" width=25>{{ item.keyword }}</li>
+      {% else %}
+      <li>{{ item.keyword }}</li>
+      {% endif %}
+      {% endfor %}
+   </ul>
+</div>
 {% endif %}
 {% if card.clan %}
-<h2>Clan</h2>
-<ul>
-   {% for item in card.clan %}
-   {% if item.name in icons %}
-   <li><img src="{{ icons[item.name] }}" width=25>{{ item.name }}</li>
-   {% else %}
-   <li>{{ item.name }}</li>
-   {% endif %}
-   {% endfor %}
-</ul>
+<div id="clan">
+   <h2>Clan</h2>
+   <ul>
+      {% for item in card.clan %}
+      {% if item.name in icons %}
+      <li><img src="{{ icons[item.name] }}" width=25>{{ item.name }}</li>
+      {% else %}
+      <li>{{ item.name }}</li>
+      {% endif %}
+      {% endfor %}
+   </ul>
+</div>
 {% endif %}
 {% if card.creed %}
-<h2>Creed</h2>
-<ul>
-   {% for item in card.creed %}
-   {% if item.name in icons %}
-   <li><img src="{{ icons[item.name] }}" width=25>{{ item.name }}</li>
-   {% else %}
-   <li>{{ item.name }}</li>
-   {% endif %}
-   {% endfor %}
-</ul>
+<div id="creed">
+   <h2>Creed</h2>
+   <ul>
+      {% for item in card.creed %}
+      {% if item.name in icons %}
+      <li><img src="{{ icons[item.name] }}" width=25>{{ item.name }}</li>
+      {% else %}
+      <li>{{ item.name }}</li>
+      {% endif %}
+      {% endfor %}
+   </ul>
+</div>
 {% endif %}
 {% if card.virtue %}
-<h2>Virtues</h2>
-<ul>
-   {% for item in card.virtue %}
-   {% if item.name in icons %}
-   <li><img src="{{ icons[item.name] }}" width=25>{{ item.name }}</li>
-   {% else %}
-   <li>{{ item.name }}</li>
-   {% endif %}
-   {% endfor %}
-</ul>
+<div id="virtues">
+   <h2>Virtues</h2>
+   <ul>
+      {% for item in card.virtue %}
+      {% if item.name in icons %}
+      <li><img src="{{ icons[item.name] }}" width=25>{{ item.name }}</li>
+      {% else %}
+      <li>{{ item.name }}</li>
+      {% endif %}
+      {% endfor %}
+   </ul>
+</div>
 {% endif %}
 {% if card.discipline %}
-<h2>Disciplines</h2>
-<ul>
-   {% for item in card.discipline|sort(attribute='discipline.name') if item.level != 'superior' %}
-   {% if item.discipline.name|lower in icons %}
-   <li><img src="{{ icons[item.discipline.name|lower] }}" width=20>{{ item.discipline.name|lower }}</li>
-   {% else %}
-   <li>{{ item.discipline.name|lower }}</li>
-   {% endif %}
-   {% endfor %}
-   {% for item in card.discipline|sort(attribute='discipline.name') if item.level == 'superior' %}
-   {% if item.discipline.name|lower in icons %}
-   <li><img src="{{ icons[item.discipline.name|lower] }}" width=22>{{ item.discipline.name|upper }}</li>
-   {% else %}
-   <li>{{ item.discipline.name|upper }}</li>
-   {% endif %}
-   {% endfor %}
-</ul>
+<div id="disciplines">
+   <h2>Disciplines</h2>
+   <ul>
+      {% for item in card.discipline|sort(attribute='discipline.name') if item.level != 'superior' %}
+      {% if item.discipline.name|lower in icons %}
+      <li><img src="{{ icons[item.discipline.name|lower] }}" width=20>{{ item.discipline.name|lower }}</li>
+      {% else %}
+      <li>{{ item.discipline.name|lower }}</li>
+      {% endif %}
+      {% endfor %}
+      {% for item in card.discipline|sort(attribute='discipline.name') if item.level == 'superior' %}
+      {% if item.discipline.name|lower in icons %}
+      <li><img src="{{ icons[item.discipline.name|lower] }}" width=22>{{ item.discipline.name|upper }}</li>
+      {% else %}
+      <li>{{ item.discipline.name|upper }}</li>
+      {% endif %}
+      {% endfor %}
+   </ul>
+</div>
 {% endif %}
 {% if card.text %}
 <div id="text">
@@ -87,6 +99,14 @@
    <!-- this needs to be marked as safe so the errata span works -->
    {% for line in text %}
    <p>{{ line|safe }}</p>
+   {% endfor %}
+</div>
+{% endif %}
+{% if card.artists %}
+<div id="artists">
+   <h2>Artists</h2>
+   {% for artist in card.artists %}
+   <p>{{ artist.name }}</p>
    {% endfor %}
 </div>
 {% endif %}
