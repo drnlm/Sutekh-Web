@@ -5,9 +5,9 @@
 <ul>
    {% for tree in cardsets recursive %}
    {% if tree.inuse %}
-   <li><a href="cardsetview/{{ tree.linkname }}"><strong>{{ tree.name }}</strong></a></li>
+   <li><a href="cardsetview/{{ tree.linkname }}"><strong>{{ tree.name }}</strong></a>{{ tree.info }}</li>
    {% else %}
-   <li><a href="cardsetview/{{ tree.linkname }}">{{ tree.name }}</a></li>
+   <li><a href="cardsetview/{{ tree.linkname }}">{{ tree.name }}</a>{{ tree.info }}</li>
    {% endif %}
    {% if tree.children %}
    <ul>

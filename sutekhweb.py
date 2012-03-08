@@ -45,14 +45,20 @@ def double_quote(sString):
 class CardSetTree(object):
     """object used to build up card set trees for the jinja template"""
 
+    __slots__ = ["name", "inuse", "linkname", "children", "info"]
+
     def __init__(self, sName, bInUse):
         self.name = sName
         self.inuse = bInUse
         self.linkname = double_quote(sName)
         self.children = []
+        self.info = ''
 
 
 class CardCount(object):
+    """Helper object for counting cards in a card set"""
+
+    __slots__ = ['card', 'cnt']
 
     def __init__(self, oCard):
         self.card = oCard
@@ -121,6 +127,17 @@ def get_all_children(oParent):
         aResult.append(oTree)
         if has_children(oCS):
             oTree.children = get_all_children(oCS)
+            if oTree.children:
+                iNumInUse = len([x for x in oTree.children if x.inuse])
+                if len(oTree.children) == 1:
+                    sChild = 'child'
+                else:
+                    sChild = 'children'
+                if iNumInUse:
+                    oTree.info = ' (%d %s, %d marked in use)' % (
+                            len(oTree.children), sChild, iNumInUse)
+                else:
+                    oTree.info = ' (%d %s)' % (len(oTree.children), sChild)
     return aResult
 
 
