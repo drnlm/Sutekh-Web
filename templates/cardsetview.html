@@ -50,7 +50,10 @@
    <input type="submit" name="expansions" value="Show Expansions">
    <input type="hidden" name="showexp" value="Hide">
    {% endif %}
+   <!-- hidden input so we keep grouping info when bouncing through
+        expansion modes -->
    <input type="hidden" name="curgrouping" value="{{ grouping }}">
+   <input type="submit" name="download" value="Download Sutekh XML">
 </form>
 {% endblock %}
 {% block navigation %}

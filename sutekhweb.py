@@ -5,22 +5,27 @@
 
 """The main web-app"""
 
-from flask import Flask, render_template, request, url_for, redirect
+from flask import Flask, render_template, request, url_for, redirect, \
+        send_file
 app = Flask(__name__)
 
 import os
 import urllib
+from StringIO import StringIO
 
 from sqlobject import sqlhub, connectionForURI, SQLObjectNotFound
 from sutekh.core.SutekhObjects import AbstractCard, IAbstractCard, \
         IPhysicalCardSet, IKeyword
 from sutekh.core.FilterParser import FilterParser
 from sutekh.core.Filters import NullFilter
+from sutekh.core.CardSetHolder import CardSetWrapper
 from sutekh.core.Groupings import MultiTypeGrouping, ClanGrouping, \
         NullGrouping, GroupGrouping, CryptLibraryGrouping, CardTypeGrouping
-from sutekh.SutekhUtility import sqlite_uri, prefs_dir, is_crypt_card
+from sutekh.SutekhUtility import sqlite_uri, prefs_dir, is_crypt_card, \
+        safe_filename
 from sutekh.core.CardSetUtilities import find_children, has_children
 from sutekh.io.IconManager import IconManager
+from sutekh.io.PhysicalCardSetWriter import PhysicalCardSetWriter
 
 
 ALLOWED_GROUPINGS = {
@@ -167,6 +172,11 @@ def cardsets():
 @app.route('/cardsetview/<sCardSetName>/<sGrouping>/<sExpMode>',
         methods=['GET', 'POST'])
 def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
+    sCorrectName = urllib.unquote(sCardSetName)
+    try:
+        oCS = IPhysicalCardSet(sCorrectName)
+    except SQLObjectNotFound:
+        oCS = None
     if request.method == 'POST':
         # Form submission
         if 'grouping' in request.form:
@@ -177,6 +187,26 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
             sExpMode = request.args.get('showexp', 'Hide')
             return redirect(url_for('filter', source='cardsetview',
                 cardsetname=sCardSetName, showexp=sExpMode))
+        elif 'download' in request.form:
+            sGrouping = request.values.get('curgrouping', 'Card Type')
+            sExpMode = request.args.get('showexp', 'Hide')
+            if oCS:
+                oWriter = PhysicalCardSetWriter()
+                oXMLFile = StringIO()
+                oWriter.write(oXMLFile, CardSetWrapper(oCS))
+                oXMLFile.seek(0)  # reset to start
+                return send_file(oXMLFile,
+                        mimetype="application/octet-stream",
+                        as_attachment=True,
+                        attachment_filename=safe_filename(
+                            "%s.xml" % sCorrectName))
+                #oXMLFile.close()
+                #return redirect(url_for('cardsetview',
+                #    sCardSetName=sCardSetName, sGrouping=sGrouping,
+                #    sExpMode=sExpMode))
+            else:
+                return render_template('invalid.html', type='Card Set Name',
+                        requested=sCardSetName)
         elif 'expansions' in request.form:
             sGrouping = request.values.get('curgrouping', 'Card Type')
             if request.values['expansions'] == 'Hide Expansions':
@@ -188,11 +218,6 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
                     sCardSetName=sCardSetName, sGrouping=sGrouping,
                     sExpMode='Show'))
     elif request.method == 'GET':
-        sCorrectName = urllib.unquote(sCardSetName)
-        try:
-            oCS = IPhysicalCardSet(sCorrectName)
-        except SQLObjectNotFound:
-            oCS = None
         if oCS:
             dCards = {}
             dCounts = {'crypt': 0, 'library': 0}
