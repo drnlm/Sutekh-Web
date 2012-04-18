@@ -55,14 +55,28 @@ class CardSetTree(object):
         self.info = ''
 
 
+class ExpCount(object):
+    """Helper object from counting expansion info"""
+
+    __slots__ = ['expname', 'cnt']
+
+    def __init__(self, oExp):
+        if oExp:
+            self.expname = oExp.name
+        else:
+            self.expname = ' Unknown Expansion'
+        self.cnt = 0
+
+
 class CardCount(object):
     """Helper object for counting cards in a card set"""
 
-    __slots__ = ['card', 'cnt']
+    __slots__ = ['card', 'cnt', 'expansions']
 
     def __init__(self, oCard):
         self.card = oCard
         self.cnt = 0
+        self.expansions = {}
 
 
 class WebIconManager(IconManager):
@@ -150,17 +164,31 @@ def cardsets():
 
 @app.route('/cardsetview/<sCardSetName>', methods=['GET', 'POST'])
 @app.route('/cardsetview/<sCardSetName>/<sGrouping>', methods=['GET', 'POST'])
-def cardsetview(sCardSetName, sGrouping=None):
-    sCorrectName = urllib.unquote(sCardSetName)
+@app.route('/cardsetview/<sCardSetName>/<sGrouping>/<sExpMode>',
+        methods=['GET', 'POST'])
+def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
     if request.method == 'POST':
         # Form submission
         if 'grouping' in request.form:
+            sExpMode = request.values.get('showexp', 'Hide')
             return redirect(url_for('change_grouping', source='cardsetview',
-                cardsetname=sCardSetName))
+                cardsetname=sCardSetName, showexp=sExpMode))
         elif 'filter' in request.form:
+            sExpMode = request.args.get('showexp', 'Hide')
             return redirect(url_for('filter', source='cardsetview',
-                cardsetname=sCardSetName))
+                cardsetname=sCardSetName, showexp=sExpMode))
+        elif 'expansions' in request.form:
+            sGrouping = request.values.get('curgrouping', 'Card Type')
+            if request.values['expansions'] == 'Hide Expansions':
+                return redirect(url_for('cardsetview',
+                    sCardSetName=sCardSetName, sGrouping=sGrouping,
+                    sExpMode='Hide'))
+            else:
+                return redirect(url_for('cardsetview',
+                    sCardSetName=sCardSetName, sGrouping=sGrouping,
+                    sExpMode='Show'))
     elif request.method == 'GET':
+        sCorrectName = urllib.unquote(sCardSetName)
         try:
             oCS = IPhysicalCardSet(sCorrectName)
         except SQLObjectNotFound:
@@ -169,18 +197,26 @@ def cardsetview(sCardSetName, sGrouping=None):
             dCards = {}
             dCounts = {'crypt': 0, 'library': 0}
             for oCard in oCS.cards:
-                dCards.setdefault(oCard.abstractCard,
+                oCount = dCards.setdefault(oCard.abstractCard,
                         CardCount(oCard.abstractCard))
-                dCards[oCard.abstractCard].cnt += 1
+                oCount.cnt += 1
+                oExpCount = oCount.expansions.setdefault(oCard.expansion,
+                        ExpCount(oCard.expansion))
+                oExpCount.cnt += 1
                 if is_crypt_card(oCard.abstractCard):
                     dCounts['crypt'] += 1
                 else:
                     dCounts['library'] += 1
             cGrouping = ALLOWED_GROUPINGS.get(sGrouping, CardTypeGrouping)
             aGrouped = cGrouping(dCards.values(), lambda x: x.card)
+            bShowExpansions = sExpMode == 'Show'
+            if not sGrouping:
+                sGrouping = 'Card Type'
             return render_template('cardsetview.html', cardset=oCS,
                     grouped=aGrouped, counts=dCounts,
-                    quotedname=urllib.quote(oCS.name, safe=''))
+                    quotedname=urllib.quote(oCS.name, safe=''),
+                    grouping=sGrouping,
+                    showexpansions=bShowExpansions)
         else:
             return render_template('invalid.html', type='Card Set Name',
                     requested=sCardSetName)
@@ -247,9 +283,10 @@ def change_grouping():
     if request.method == 'GET':
         sSource = request.args.get('source', 'cardlist')
         sCardSet = request.args.get('cardsetname', '')
+        sExpMode = request.args.get('showexp', 'Hide')
         return render_template('grouping.html',
                 groupings=sorted(ALLOWED_GROUPINGS), source=sSource,
-                cardsetname=sCardSet)
+                cardsetname=sCardSet, showexp=sExpMode)
     elif request.method == 'POST':
         sNewGrouping = request.form['grouping']
         sSource = request.form['source']
@@ -257,8 +294,9 @@ def change_grouping():
             return redirect(url_for(sSource, sGrouping=sNewGrouping))
         else:
             sCardSet = request.form['cardset']
+            sExpMode = request.form['showexp']
             return redirect(url_for(sSource, sCardSetName=sCardSet,
-                sGrouping=sNewGrouping))
+                sGrouping=sNewGrouping, sExpMode=sExpMode))
     else:
         print 'Error, fell off the back of the world'
 

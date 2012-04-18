@@ -27,6 +27,13 @@
 <h3>{{ group }}</h3>
 {% for item in cards|sort(attribute='card.name') %}
 <p>{{ item.cnt }} x <a href="/card/{{ item.card.name }}">{{ item.card.name }}</a></p>
+{% if showexpansions %}
+<div id="subcard">
+{% for exp in item.expansions.values()|sort(attribute='expname') %}
+<p>{{ exp.cnt }} x {{ exp.expname }}</p>
+{% endfor %}
+</div>
+{% endif %}
 {% endfor %}
 {% endfor %}
 {% endblock %}
@@ -34,6 +41,16 @@
 <form action="{{ url_for('cardsetview', sCardSetName=quotedname) }}" method=post>
    <input type="submit" name="grouping" value="Change Grouping">
    <input type="submit" name="filter" value="Specify Filter">
+   {% if showexpansions %}
+   <input type="submit" name="expansions" value="Hide Expansions">
+   <!-- hidden input so we keep the expansion info when bouncing through
+        filter and change_group forms -->
+   <input type="hidden" name="showexp" value="Show">
+   {% else %}
+   <input type="submit" name="expansions" value="Show Expansions">
+   <input type="hidden" name="showexp" value="Hide">
+   {% endif %}
+   <input type="hidden" name="curgrouping" value="{{ grouping }}">
 </form>
 {% endblock %}
 {% block navigation %}

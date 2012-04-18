@@ -33,6 +33,15 @@ div#content p {
    padding-bottom: 0px;
 }
 
+/* Indent expansions, etc. */
+div#subcard p {
+   margin-top: 0px;
+   margin-bottom: 0px;
+   padding-top: 0px;
+   padding-bottom: 0px;
+   text-indent: 40px;
+}
+
 span.errata {
    color: #f88;
 }
