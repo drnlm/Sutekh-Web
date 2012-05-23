@@ -2,5 +2,25 @@
 {% block title %}Specify Filter{% endblock %}
 {% block content %}
 <h1>Specify Filter</h1>
-<p><em>TODO: This still needs to be implemented. Sorry</em></p>
+<form action="{{ url_for('filter', sType=type) }}" method=post>
+   <p><input type="radio" value="and" name="combine" checked>All of</input></p>
+   <p><input type="radio" value="or" name="combine" >Any of</input></p>
+   {% for elem, desc in stringfilters %}
+   <p>{{ desc }} : <input type="text" name="{{ elem }}"></p>
+   {% endfor %}
+   {% for elem, desc, list in listfilters %}
+   <p>{{ desc }}:<select name = "{{ elem }}" size="5" multiple>
+      {% for value in list %}
+      <option value="{{ value }}">{{ value }}</option>
+      {% endfor %}
+   </select></p>
+   {% endfor %}
+{% endblock %}
+{% block buttons %}
+   <input type="hidden" name="source" value="{{ source }}">
+   <input type="hidden" name="cardset" value="{{ cardsetname }}">
+   <input type="hidden" name="showexp" value="{{ showexp }}">
+   <input type="hidden" name="grouping" value="{{ grouping }}">
+   <input type="submit" name="filter" value="Submit Filter">
+</form>
 {% endblock %}

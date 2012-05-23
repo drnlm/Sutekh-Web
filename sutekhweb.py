@@ -16,8 +16,10 @@ from StringIO import StringIO
 from sqlobject import sqlhub, connectionForURI, SQLObjectNotFound
 from sutekh.core.SutekhObjects import AbstractCard, IAbstractCard, \
         IPhysicalCardSet, IKeyword
-from sutekh.core.FilterParser import FilterParser
-from sutekh.core.Filters import NullFilter
+from sutekh.core.FilterParser import FilterParser, escape
+from sutekh.core.Filters import NullFilter, MultiCardTypeFilter, \
+        MultiClanFilter, MultiVirtueFilter, MultiCreedFilter, \
+        MultiDisciplineFilter, MultiKeywordFilter
 from sutekh.core.CardSetHolder import CardSetWrapper
 from sutekh.core.Groupings import MultiTypeGrouping, ClanGrouping, \
         NullGrouping, GroupGrouping, CryptLibraryGrouping, CardTypeGrouping
@@ -36,6 +38,20 @@ ALLOWED_GROUPINGS = {
         'Clan or Creed': ClanGrouping,
         'Crypt or Library': CryptLibraryGrouping
         }
+
+STRING_FILTERS = [
+        ('cardname', 'CardName'),
+        ('cardtext', 'CardText'),
+        ]
+
+LIST_FILTERS = [
+        ('cardtype', 'CardType', MultiCardTypeFilter),
+        ('discipline', 'Discipline', MultiDisciplineFilter),
+        ('virtue', 'Virtue', MultiVirtueFilter),
+        ('clan', 'Clan', MultiClanFilter),
+        ('creed', 'Creed', MultiCreedFilter),
+        ('keyword', 'Keyword', MultiKeywordFilter),
+        ]
 
 
 # Utility classes and functions for passing info the jinja2 easily
@@ -180,13 +196,17 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
     if request.method == 'POST':
         # Form submission
         if 'grouping' in request.form:
+            sFilter = request.values.get('curfilter', '')
             sExpMode = request.values.get('showexp', 'Hide')
             return redirect(url_for('change_grouping', source='cardsetview',
-                cardsetname=sCardSetName, showexp=sExpMode))
+                cardsetname=sCardSetName, showexp=sExpMode,
+                curfilter=sFilter))
         elif 'filter' in request.form:
+            sGrouping = request.values.get('curgrouping', 'Card Type')
             sExpMode = request.args.get('showexp', 'Hide')
             return redirect(url_for('filter', source='cardsetview',
-                cardsetname=sCardSetName, showexp=sExpMode))
+                cardsetname=sCardSetName, showexp=sExpMode,
+                grouping=sGrouping))
         elif 'download' in request.form:
             sGrouping = request.values.get('curgrouping', 'Card Type')
             sExpMode = request.args.get('showexp', 'Hide')
@@ -233,13 +253,21 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
                 else:
                     dCounts['library'] += 1
             cGrouping = ALLOWED_GROUPINGS.get(sGrouping, CardTypeGrouping)
-            aGrouped = cGrouping(dCards.values(), lambda x: x.card)
+            sFilter = request.args.get('filter', None)
+            if sFilter:
+                oFilter = PARSER.apply(sFilter).get_filter()
+                # FIXME: Filter the card set
+                aGrouped = cGrouping(oFilter.select(AbstractCard),
+                        IAbstractCard)
+            else:
+                aGrouped = cGrouping(dCards.values(), lambda x: x.card)
             bShowExpansions = sExpMode == 'Show'
             if not sGrouping:
                 sGrouping = 'Card Type'
             return render_template('cardsetview.html', cardset=oCS,
                     grouped=aGrouped, counts=dCounts,
                     quotedname=urllib.quote(oCS.name, safe=''),
+                    curfilter=sFilter,
                     grouping=sGrouping,
                     showexpansions=bShowExpansions)
         else:
@@ -309,17 +337,27 @@ def change_grouping():
         sSource = request.args.get('source', 'cardlist')
         sCardSet = request.args.get('cardsetname', '')
         sExpMode = request.args.get('showexp', 'Hide')
+        sFilter = request.args.get('curfilter', '')
         return render_template('grouping.html',
                 groupings=sorted(ALLOWED_GROUPINGS), source=sSource,
-                cardsetname=sCardSet, showexp=sExpMode)
+                cardsetname=sCardSet, showexp=sExpMode,
+                curfilter=sFilter)
     elif request.method == 'POST':
         sNewGrouping = request.form['grouping']
+        sFilter = request.form['curfilter']
         sSource = request.form['source']
         if sSource == 'cardlist':
+            if sFilter:
+                return redirect(url_for(sSource, sGrouping=sNewGrouping,
+                    filter=sFilter))
             return redirect(url_for(sSource, sGrouping=sNewGrouping))
         else:
             sCardSet = request.form['cardset']
             sExpMode = request.form['showexp']
+            if sFilter:
+                return redirect(url_for(sSource, sCardSetName=sCardSet,
+                    sGrouping=sNewGrouping, sExpMode=sExpMode,
+                    filter=sFilter))
             return redirect(url_for(sSource, sCardSetName=sCardSet,
                 sGrouping=sNewGrouping, sExpMode=sExpMode))
     else:
@@ -333,14 +371,18 @@ def cardlist(sGrouping=None):
     if request.method == 'POST':
         # Form submission
         if 'grouping' in request.form:
-            return redirect(url_for('change_grouping', source='cardlist'))
+            sFilter = request.values.get('curfilter', '')
+            return redirect(url_for('change_grouping', source='cardlist',
+                curfilter=sFilter))
         elif 'filter' in request.form:
-            return redirect(url_for('filter', source='cardlist'))
+            sGroup = request.values.get('curgrouping', 'Card Type')
+            return redirect(url_for('filter', source='cardlist',
+                grouping=sGroup))
     if sGrouping is None:
         sGroup = 'Card Type'
     else:
         sGroup = sGrouping
-    sFilter = request. args.get('filter', None)
+    sFilter = request.args.get('filter', None)
     if sFilter:
         oFilter = PARSER.apply(sFilter).get_filter()
     else:
@@ -349,7 +391,7 @@ def cardlist(sGrouping=None):
     aGrpData = cGrouping(oFilter.select(AbstractCard), IAbstractCard)
     return render_template('cardlist.html', grouped=aGrpData,
             groupings=sorted(ALLOWED_GROUPINGS),
-            groupby=sGroup)
+            grouping=sGroup, curfilter=sFilter)
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -375,9 +417,44 @@ def simple_search(sType='Card Name'):
                 requested=sType)
 
 
-@app.route('/filter')
+@app.route('/filter', methods=['GET', 'POST'])
 def filter():
-    return render_template('filter.html')
+    """Support some of the Sutekh Filter Options"""
+    if request.method == 'POST':
+        sCurGrouping = request.form['grouping']
+        sSource = request.form['source']
+        sCardSet = request.form['cardset']
+        sExpMode = request.form['showexp']
+        sComb = ' %s ' % request.form['combine']
+        aFilterBits = []
+        for sElement, sFilter in STRING_FILTERS:
+            if sElement in request.form:
+                sData = request.form[sElement]
+                if sData:
+                    aFilterBits.append('%s = "%s"' % (sFilter, escape(sData)))
+        for sElement, sFilter, _ in LIST_FILTERS:
+            if sElement in request.form:
+                sValues = ','.join(['"%s"' % x for x in
+                    request.form.getlist(sElement)])
+                aFilterBits.append('%s = %s' % (sFilter, sValues))
+        sTotalFilter = sComb.join(aFilterBits)
+        if sSource == 'cardlist':
+            return redirect(url_for(sSource, sGrouping=sCurGrouping,
+                filter=sTotalFilter))
+        return redirect(url_for(sSource, sCardSetName=sCardSet,
+            sGrouping=sCurGrouping, sExpMode=sExpMode,
+            filter=sTotalFilter))
+    else:
+        sSource = request.args.get('source', 'cardlist')
+        sCardSet = request.args.get('cardsetname', '')
+        sExpMode = request.args.get('showexp', 'Hide')
+        sGroupBy = request.args.get('grouping', 'Card Type')
+        aListFilters = []
+        for sElement, sText, cCls in LIST_FILTERS:
+            aListFilters.append((sElement, sText, cCls.get_values()))
+        return render_template('filter.html', grouping=sGroupBy,
+                source=sSource, cardset=sCardSet, expmode=sExpMode,
+                listfilters=aListFilters, stringfilters=STRING_FILTERS)
 
 
 if __name__ == "__main__":
