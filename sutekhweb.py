@@ -190,6 +190,8 @@ def cardsets():
 @app.route('/cardsetview/<sCardSetName>/<sGrouping>/', methods=['GET', 'POST'])
 @app.route('/cardsetview/<sCardSetName>/<sGrouping>/<sExpMode>',
         methods=['GET', 'POST'])
+@app.route('/cardsetview/<sCardSetName>/<sGrouping>/<sExpMode>/',
+        methods=['GET', 'POST'])
 def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
     sCorrectName = urllib.unquote(sCardSetName)
     try:
