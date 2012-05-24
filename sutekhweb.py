@@ -205,7 +205,7 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
                 curfilter=sFilter))
         elif 'filter' in request.form:
             sGrouping = request.values.get('curgrouping', 'Card Type')
-            sExpMode = request.args.get('showexp', 'Hide')
+            sExpMode = request.values.get('showexp', 'Hide')
             return redirect(url_for('filter', source='cardsetview',
                 cardsetname=sCardSetName, showexp=sExpMode,
                 grouping=sGrouping))
