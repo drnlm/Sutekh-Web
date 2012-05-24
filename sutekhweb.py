@@ -179,7 +179,6 @@ def get_all_children(oParent):
 
 
 @app.route('/cardsets')
-@app.route('/cardsets/')
 def cardsets():
     """List the collections card sets"""
     aCardSets = get_all_children(None)
@@ -187,12 +186,8 @@ def cardsets():
 
 
 @app.route('/cardsetview/<sCardSetName>', methods=['GET', 'POST'])
-@app.route('/cardsetview/<sCardSetName>/', methods=['GET', 'POST'])
 @app.route('/cardsetview/<sCardSetName>/<sGrouping>', methods=['GET', 'POST'])
-@app.route('/cardsetview/<sCardSetName>/<sGrouping>/', methods=['GET', 'POST'])
 @app.route('/cardsetview/<sCardSetName>/<sGrouping>/<sExpMode>',
-        methods=['GET', 'POST'])
-@app.route('/cardsetview/<sCardSetName>/<sGrouping>/<sExpMode>/',
         methods=['GET', 'POST'])
 def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
     sCorrectName = urllib.unquote(sCardSetName)
@@ -288,7 +283,6 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
 
 
 @app.route('/card/<sCardName>')
-@app.route('/card/<sCardName>/')
 def print_card(sCardName):
     """Display card details"""
     try:
@@ -344,7 +338,6 @@ def print_card(sCardName):
 
 
 @app.route('/grouping', methods=['GET', 'POST'])
-@app.route('/grouping/', methods=['GET', 'POST'])
 def change_grouping():
     """Handle changing the grouping"""
     if request.method == 'GET':
@@ -379,9 +372,7 @@ def change_grouping():
 
 
 @app.route('/cardlist', methods=['GET', 'POST'])
-@app.route('/cardlist/', methods=['GET', 'POST'])
 @app.route('/cardlist/<sGrouping>', methods=['GET', 'POST'])
-@app.route('/cardlist/<sGrouping>/', methods=['GET', 'POST'])
 def cardlist(sGrouping=None):
     """List the WW cardlist"""
     if request.method == 'POST':
@@ -414,9 +405,7 @@ def cardlist(sGrouping=None):
 
 
 @app.route('/search', methods=['GET', 'POST'])
-@app.route('/search/', methods=['GET', 'POST'])
 @app.route('/search/<sType>', methods=['GET', 'POST'])
-@app.route('/search/<sType>/', methods=['GET', 'POST'])
 def simple_search(sType='Card Name'):
     """Allow searching on Card Name"""
     if request.method == 'POST':
@@ -439,7 +428,6 @@ def simple_search(sType='Card Name'):
 
 
 @app.route('/filter', methods=['GET', 'POST'])
-@app.route('/filter/', methods=['GET', 'POST'])
 def filter():
     """Support some of the Sutekh Filter Options"""
     if request.method == 'POST':
