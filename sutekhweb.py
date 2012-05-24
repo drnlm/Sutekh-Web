@@ -230,15 +230,16 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
                 return render_template('invalid.html', type='Card Set Name',
                         requested=sCardSetName)
         elif 'expansions' in request.form:
+            sFilter = request.values.get('curfilter', '')
             sGrouping = request.values.get('curgrouping', 'Card Type')
             if request.values['expansions'] == 'Hide Expansions':
                 return redirect(url_for('cardsetview',
                     sCardSetName=sCardSetName, sGrouping=sGrouping,
-                    sExpMode='Hide'))
+                    sExpMode='Hide', filter=sFilter))
             else:
                 return redirect(url_for('cardsetview',
                     sCardSetName=sCardSetName, sGrouping=sGrouping,
-                    sExpMode='Show'))
+                    sExpMode='Show', filter=sFilter))
     elif request.method == 'GET':
         if oCS:
             dCards = {}
