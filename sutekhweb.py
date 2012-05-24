@@ -15,11 +15,13 @@ from StringIO import StringIO
 
 from sqlobject import sqlhub, connectionForURI, SQLObjectNotFound
 from sutekh.core.SutekhObjects import AbstractCard, IAbstractCard, \
-        IPhysicalCardSet, IKeyword
+        IPhysicalCardSet, IKeyword, MapPhysicalCardToPhysicalCardSet, \
+        IPhysicalCard
 from sutekh.core.FilterParser import FilterParser, escape
 from sutekh.core.Filters import NullFilter, MultiCardTypeFilter, \
         MultiClanFilter, MultiVirtueFilter, MultiCreedFilter, \
-        MultiDisciplineFilter, MultiKeywordFilter
+        MultiDisciplineFilter, MultiKeywordFilter, PhysicalCardSetFilter, \
+        FilterAndBox
 from sutekh.core.CardSetHolder import CardSetWrapper
 from sutekh.core.Groupings import MultiTypeGrouping, ClanGrouping, \
         NullGrouping, GroupGrouping, CryptLibraryGrouping, CardTypeGrouping
@@ -246,7 +248,20 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
         if oCS:
             dCards = {}
             dCounts = {'crypt': 0, 'library': 0}
-            for oCard in oCS.cards:
+            cGrouping = ALLOWED_GROUPINGS.get(sGrouping, CardTypeGrouping)
+            sFilter = request.args.get('filter', None)
+            if sFilter and sFilter != 'None':
+                try:
+                    oCardFilter = PARSER.apply(sFilter).get_filter()
+                    oCSFilter = PhysicalCardSetFilter(oCS.name)
+                    oFilter = FilterAndBox([oCSFilter, oCardFilter])
+                    aResults = oFilter.select(MapPhysicalCardToPhysicalCardSet)
+                    aCards = [IPhysicalCard(x) for x in aResults]
+                except Exception:
+                    aCards = oCS.cards
+            else:
+                aCards = oCS.cards
+            for oCard in aCards:
                 oCount = dCards.setdefault(oCard.abstractCard,
                         CardCount(oCard.abstractCard))
                 oCount.cnt += 1
@@ -257,16 +272,8 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
                     dCounts['crypt'] += 1
                 else:
                     dCounts['library'] += 1
-            cGrouping = ALLOWED_GROUPINGS.get(sGrouping, CardTypeGrouping)
-            sFilter = request.args.get('filter', None)
-            if sFilter and sFilter != 'None':
-                oFilter = PARSER.apply(sFilter).get_filter()
-                # FIXME: Filter the card set
-                aGrouped = cGrouping(oFilter.select(AbstractCard),
-                        IAbstractCard)
-            else:
-                aGrouped = cGrouping(dCards.values(), lambda x: x.card)
-            bShowExpansions = sExpMode == 'Show'
+            aGrouped = cGrouping(dCards.values(), lambda x: x.card)
+            bShowExpansions = (sExpMode == 'Show')
             if not sGrouping:
                 sGrouping = 'Card Type'
             return render_template('cardsetview.html', cardset=oCS,
@@ -393,7 +400,10 @@ def cardlist(sGrouping=None):
         sGroup = sGrouping
     sFilter = request.args.get('filter', None)
     if sFilter and sFilter != 'None':
-        oFilter = PARSER.apply(sFilter).get_filter()
+        try:
+            oFilter = PARSER.apply(sFilter).get_filter()
+        except Exception:
+            oFilter = NullFilter()
     else:
         oFilter = NullFilter()
     cGrouping = ALLOWED_GROUPINGS.get(sGrouping, CardTypeGrouping)
