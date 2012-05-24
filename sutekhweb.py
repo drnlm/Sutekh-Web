@@ -257,7 +257,7 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
                     dCounts['library'] += 1
             cGrouping = ALLOWED_GROUPINGS.get(sGrouping, CardTypeGrouping)
             sFilter = request.args.get('filter', None)
-            if sFilter:
+            if sFilter and sFilter != 'None':
                 oFilter = PARSER.apply(sFilter).get_filter()
                 # FIXME: Filter the card set
                 aGrouped = cGrouping(oFilter.select(AbstractCard),
@@ -352,14 +352,14 @@ def change_grouping():
         sFilter = request.form['curfilter']
         sSource = request.form['source']
         if sSource == 'cardlist':
-            if sFilter:
+            if sFilter and sFilter != 'None':
                 return redirect(url_for(sSource, sGrouping=sNewGrouping,
                     filter=sFilter))
             return redirect(url_for(sSource, sGrouping=sNewGrouping))
         else:
             sCardSet = request.form['cardset']
             sExpMode = request.form['showexp']
-            if sFilter:
+            if sFilter and sFilter != 'None':
                 return redirect(url_for(sSource, sCardSetName=sCardSet,
                     sGrouping=sNewGrouping, sExpMode=sExpMode,
                     filter=sFilter))
@@ -390,7 +390,7 @@ def cardlist(sGrouping=None):
     else:
         sGroup = sGrouping
     sFilter = request.args.get('filter', None)
-    if sFilter:
+    if sFilter and sFilter != 'None':
         oFilter = PARSER.apply(sFilter).get_filter()
     else:
         oFilter = NullFilter()
