@@ -475,7 +475,7 @@ def filter():
         for sElement, sText, cCls in LIST_FILTERS:
             aListFilters.append((sElement, sText, cCls.get_values()))
         return render_template('filter.html', grouping=sGroupBy,
-                source=sSource, cardsetname=sCardSet, expmode=sExpMode,
+                source=sSource, cardsetname=sCardSet, showexp=sExpMode,
                 listfilters=aListFilters, stringfilters=STRING_FILTERS)
 
 
