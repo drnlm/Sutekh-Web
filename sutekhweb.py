@@ -210,8 +210,6 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
                 cardsetname=sCardSetName, showexp=sExpMode,
                 grouping=sGrouping))
         elif 'download' in request.form:
-            sGrouping = request.values.get('curgrouping', 'Card Type')
-            sExpMode = request.args.get('showexp', 'Hide')
             if oCS:
                 oWriter = PhysicalCardSetWriter()
                 oXMLFile = StringIO()
@@ -222,10 +220,6 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
                         as_attachment=True,
                         attachment_filename=safe_filename(
                             "%s.xml" % sCorrectName))
-                #oXMLFile.close()
-                #return redirect(url_for('cardsetview',
-                #    sCardSetName=sCardSetName, sGrouping=sGrouping,
-                #    sExpMode=sExpMode))
             else:
                 return render_template('invalid.html', type='Card Set Name',
                         requested=sCardSetName)
