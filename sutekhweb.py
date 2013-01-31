@@ -62,7 +62,6 @@ def double_quote(sString):
        character.
 
        Needed to bypass flask's unquoting in some cases."""
-    sString = sString.replace(' ', '_')
     return urllib.quote(urllib.quote(sString, safe=''))
 
 
