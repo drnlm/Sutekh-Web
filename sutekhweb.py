@@ -62,18 +62,24 @@ def double_quote(sString):
        character.
 
        Needed to bypass flask's unquoting in some cases."""
+    sString = sString.replace(' ', '_')
     return urllib.quote(urllib.quote(sString, safe=''))
 
 
 class CardSetTree(object):
     """object used to build up card set trees for the jinja template"""
 
-    __slots__ = ["name", "inuse", "linkname", "children", "info"]
+    __slots__ = ["name", "inuse", "linkname", "children", "info", "nodeid",
+            "parent"]
 
-    def __init__(self, sName, bInUse):
+    def __init__(self, sName, bInUse, oParent, iId):
         self.name = sName
         self.inuse = bInUse
         self.linkname = double_quote(sName)
+        self.parent = ''
+        self.nodeid = 'node%d' % iId
+        if oParent:
+            self.parent = oParent.nodeid
         self.children = []
         self.info = ''
 
@@ -157,13 +163,14 @@ def start():
     return render_template('index.html', groupings=sorted(ALLOWED_GROUPINGS))
 
 
-def get_all_children(oParent):
+def get_all_children(oParent, iId, oParNode=None):
     aResult = []
     for oCS in sorted(find_children(oParent), key=lambda x: x.name):
-        oTree = CardSetTree(oCS.name, oCS.inuse)
+        iId += 1
+        oTree = CardSetTree(oCS.name, oCS.inuse, oParNode, iId)
         aResult.append(oTree)
         if has_children(oCS):
-            oTree.children = get_all_children(oCS)
+            oTree.children, iId = get_all_children(oCS, iId, oTree)
             if oTree.children:
                 iNumInUse = len([x for x in oTree.children if x.inuse])
                 if len(oTree.children) == 1:
@@ -175,13 +182,13 @@ def get_all_children(oParent):
                             len(oTree.children), sChild, iNumInUse)
                 else:
                     oTree.info = ' (%d %s)' % (len(oTree.children), sChild)
-    return aResult
+    return aResult, iId
 
 
 @app.route('/cardsets')
 def cardsets():
     """List the collections card sets"""
-    aCardSets = get_all_children(None)
+    aCardSets, _ = get_all_children(None, 0)
     return render_template('cardsets.html', cardsets=aCardSets)
 
 

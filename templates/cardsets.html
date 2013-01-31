@@ -1,14 +1,25 @@
 {% extends "base.html" %}
+{% block jscript %}<script type="text/javascript">
+   $(document).ready(function()  {
+      $("#cardsettree").treeTable();
+   });
+</script>{% endblock %}
 {% block title %}Card Set List{% endblock %}
 {% block content %}
 <h1>Card Set List</h1>
-<ul>
+<table id="cardsettree">
    {% for tree in cardsets recursive %}
-   {% if tree.inuse %}
-   <li><a href="cardsetview/{{ tree.linkname }}"><strong>{{ tree.name }}</strong></a>{{ tree.info }}</li>
+   {% if tree.parent %}
+   <tr id="{{ tree.nodeid }}" class="child-of-{{ tree.parent }}"><td>
    {% else %}
-   <li><a href="cardsetview/{{ tree.linkname }}">{{ tree.name }}</a>{{ tree.info }}</li>
+   <tr id="{{ tree.nodeid }}"><td>
    {% endif %}
+   {% if tree.inuse %}
+   <a href="cardsetview/{{ tree.linkname }}"><strong>{{ tree.name }}</strong></a>
+   {% else %}
+   <a href="cardsetview/{{ tree.linkname }}">{{ tree.name }}</a>
+   {% endif %}
+   </td><td>{{ tree.info }}</td></tr>
    {% if tree.children %}
    <ul>
       {{ loop(tree.children) }}
