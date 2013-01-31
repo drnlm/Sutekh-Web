@@ -21,12 +21,10 @@
    {% endif %}
    </td><td>{{ tree.info }}</td></tr>
    {% if tree.children %}
-   <ul>
-      {{ loop(tree.children) }}
-   </ul>
+   {{ loop(tree.children) }}
    {% endif %}
    {% endfor %}
-</ul>
+</table>
 {% endblock %}
 {% block navigation %}
 <p>Return to <a href="/">Main page</a></p>
