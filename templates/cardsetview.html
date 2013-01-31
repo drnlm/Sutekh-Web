@@ -1,4 +1,9 @@
 {% extends "base.html" %}
+{% block jscript %}<script type="text/javascript">
+   $(document).ready(function()  {
+      $("#cardsetlist").treeTable();
+   });
+</script>{% endblock %}
 {% block title %}{{ cardset.name }}{% endblock %}
 {% block content %}
 <h1>{{ cardset.name }}</h1>
@@ -23,19 +28,24 @@
 
 <!-- This should be made prettier -->
 
+{% set groupstep = 10000 %}
+{% set expstep = 100 %}
+
+<table id="cardsetlist">
 {% for group, cards in grouped %}
-<h3>{{ group }}</h3>
+<tr id="{{ loop.index }}"><td>{{ group }}</td></tr>
+{% set grouploop = loop %}
 {% for item in cards|sort(attribute='card.name') %}
-<p>{{ item.cnt }} x <a href="/card/{{ item.card.name }}">{{ item.card.name }}</a></p>
+<tr id="{{ groupstep * grouploop.index + loop.index }}" class="child-of-{{ grouploop.index }}"><td>{{ item.cnt }} x <a href="/card/{{ item.card.name }}">{{ item.card.name }}</a></td></tr>
 {% if showexpansions %}
-<div id="subcard">
+{% set cardloop = loop %}
 {% for exp in item.expansions.values()|sort(attribute='expname') %}
-<p>{{ exp.cnt }} x {{ exp.expname }}</p>
+<tr id="{{ groupstep * expstep * grouploop.index + expstep * cardloop.index + loop.index }}" class="child-of-{{ grouploop.index * groupstep + cardloop.index }}"><td>{{ exp.cnt }} x {{ exp.expname }}</td></tr>
 {% endfor %}
-</div>
 {% endif %}
 {% endfor %}
 {% endfor %}
+</table>
 {% endblock %}
 {% block buttons %}
 <form action="{{ url_for('cardsetview', sCardSetName=quotedname) }}" method=post>
