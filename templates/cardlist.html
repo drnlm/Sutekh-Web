@@ -10,12 +10,14 @@
 
 <!-- This should be made prettier -->
 
+{% set groupstep = 10000 %}
+
 <table id="cardlist">
 {% for group, cards in grouped %}
 <tr id="{{ loop.index }}"><td>{{ group }}</td></tr>
 {% set grouploop = loop %}
 {% for card in cards %}
-<tr id="{{ grouploop.index * 10000 + loop.index }}" class="child-of-{{ grouploop.index }}"><td><a href="/card/{{ card.name }}">{{ card.name }}</a></td></tr>
+<tr id="{{ grouploop.index * groupstep + loop.index }}" class="child-of-{{ grouploop.index }}"><td><a href="/card/{{ card.name }}">{{ card.name }}</a></td></tr>
 {% endfor %}
 {% endfor %}
 </table>
