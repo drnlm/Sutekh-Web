@@ -77,7 +77,7 @@ class CardSetTree(object):
     def __init__(self, sName, bInUse, oParent, iId):
         self.name = sName
         self.inuse = bInUse
-        self.linkname = double_quote(sName)
+        self.linkname = double_quote(sName.encode('utf8'))
         self.parent = ''
         self.nodeid = 'node%d' % iId
         if oParent:
