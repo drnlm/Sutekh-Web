@@ -5,8 +5,8 @@
 
 """The main web-app"""
 
-from flask import Flask, render_template, request, url_for, redirect, \
-        send_file
+from flask import (Flask, render_template, request, url_for, redirect,
+                   send_file)
 app = Flask(__name__)
 
 import os
@@ -14,46 +14,46 @@ import urllib
 from StringIO import StringIO
 
 from sqlobject import sqlhub, connectionForURI, SQLObjectNotFound
-from sutekh.core.SutekhObjects import AbstractCard, IAbstractCard, \
-        IPhysicalCardSet, IKeyword, MapPhysicalCardToPhysicalCardSet, \
-        IPhysicalCard
+from sutekh.core.SutekhObjects import (AbstractCard, IAbstractCard,
+                                       IPhysicalCardSet, IKeyword,
+                                       MapPhysicalCardToPhysicalCardSet,
+                                       IPhysicalCard)
 from sutekh.core.FilterParser import FilterParser, escape
-from sutekh.core.Filters import NullFilter, MultiCardTypeFilter, \
-        MultiClanFilter, MultiVirtueFilter, MultiCreedFilter, \
-        MultiDisciplineFilter, MultiKeywordFilter, PhysicalCardSetFilter, \
-        FilterAndBox
+from sutekh.core.Filters import (NullFilter, MultiCardTypeFilter,
+                                 MultiClanFilter, MultiVirtueFilter,
+                                 MultiCreedFilter,
+                                 MultiDisciplineFilter, MultiKeywordFilter,
+                                 PhysicalCardSetFilter, FilterAndBox)
 from sutekh.core.CardSetHolder import CardSetWrapper
-from sutekh.core.Groupings import MultiTypeGrouping, ClanGrouping, \
-        NullGrouping, GroupGrouping, CryptLibraryGrouping, CardTypeGrouping
-from sutekh.SutekhUtility import sqlite_uri, prefs_dir, is_crypt_card, \
-        safe_filename
+from sutekh.core.Groupings import (MultiTypeGrouping, ClanGrouping,
+                                   NullGrouping, GroupGrouping,
+                                   CryptLibraryGrouping, CardTypeGrouping)
+from sutekh.SutekhUtility import (sqlite_uri, prefs_dir, is_crypt_card,
+                                  safe_filename)
 from sutekh.core.CardSetUtilities import find_children, has_children
 from sutekh.io.IconManager import IconManager
 from sutekh.io.PhysicalCardSetWriter import PhysicalCardSetWriter
 
 
-ALLOWED_GROUPINGS = {
-        'No': NullGrouping,
-        'Card Type': CardTypeGrouping,
-        'Multi Card Type': MultiTypeGrouping,
-        'Crypt Group': GroupGrouping,
-        'Clan or Creed': ClanGrouping,
-        'Crypt or Library': CryptLibraryGrouping
-        }
+ALLOWED_GROUPINGS = {'No': NullGrouping,
+                     'Card Type': CardTypeGrouping,
+                     'Multi Card Type': MultiTypeGrouping,
+                     'Crypt Group': GroupGrouping,
+                     'Clan or Creed': ClanGrouping,
+                     'Crypt or Library': CryptLibraryGrouping
+                     }
 
-STRING_FILTERS = [
-        ('cardname', 'CardName'),
-        ('cardtext', 'CardText'),
-        ]
+STRING_FILTERS = [('cardname', 'CardName'),
+                  ('cardtext', 'CardText'),
+                  ]
 
-LIST_FILTERS = [
-        ('cardtype', 'CardType', MultiCardTypeFilter),
-        ('discipline', 'Discipline', MultiDisciplineFilter),
-        ('virtue', 'Virtue', MultiVirtueFilter),
-        ('clan', 'Clan', MultiClanFilter),
-        ('creed', 'Creed', MultiCreedFilter),
-        ('keyword', 'Keyword', MultiKeywordFilter),
-        ]
+LIST_FILTERS = [('cardtype', 'CardType', MultiCardTypeFilter),
+                ('discipline', 'Discipline', MultiDisciplineFilter),
+                ('virtue', 'Virtue', MultiVirtueFilter),
+                ('clan', 'Clan', MultiClanFilter),
+                ('creed', 'Creed', MultiCreedFilter),
+                ('keyword', 'Keyword', MultiKeywordFilter),
+                ]
 
 
 # Utility classes and functions for passing info the jinja2 easily
@@ -69,7 +69,7 @@ class CardSetTree(object):
     """object used to build up card set trees for the jinja template"""
 
     __slots__ = ["name", "inuse", "linkname", "children", "info", "nodeid",
-            "parent"]
+                 "parent"]
 
     def __init__(self, sName, bInUse, oParent, iId):
         self.name = sName
@@ -112,7 +112,7 @@ class WebIconManager(IconManager):
     def _get_icon(self, sFileName, _iSize=12):
         if sFileName:
             return url_for('static',
-                    filename='/'.join((self._sPrefsDir, sFileName)))
+                           filename='/'.join((self._sPrefsDir, sFileName)))
         return None
 
     def get_all_icons(self, oCard):
@@ -134,10 +134,10 @@ class WebIconManager(IconManager):
         for oItem in oCard.keywords:
             if oItem == IKeyword('burn option'):
                 dIcons.update({oItem.keyword:
-                    self.get_icon_by_name('burn option')})
+                               self.get_icon_by_name('burn option')})
             elif oItem == IKeyword('advanced'):
                 dIcons.update({oItem.keyword:
-                    self.get_icon_by_name('advanced')})
+                               self.get_icon_by_name('advanced')})
         return dIcons
 
 
@@ -178,7 +178,7 @@ def get_all_children(oParent, iId, oParNode=None):
                     sChild = 'children'
                 if iNumInUse:
                     oTree.info = ' (%d %s, %d marked in use)' % (
-                            len(oTree.children), sChild, iNumInUse)
+                        len(oTree.children), sChild, iNumInUse)
                 else:
                     oTree.info = ' (%d %s)' % (len(oTree.children), sChild)
     return aResult, iId
@@ -194,7 +194,7 @@ def cardsets():
 @app.route('/cardsetview/<sCardSetName>', methods=['GET', 'POST'])
 @app.route('/cardsetview/<sCardSetName>/<sGrouping>', methods=['GET', 'POST'])
 @app.route('/cardsetview/<sCardSetName>/<sGrouping>/<sExpMode>',
-        methods=['GET', 'POST'])
+           methods=['GET', 'POST'])
 def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
     sCorrectName = urllib.unquote(sCardSetName)
     try:
@@ -207,14 +207,16 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
             sFilter = request.values.get('curfilter', '')
             sExpMode = request.values.get('showexp', 'Hide')
             return redirect(url_for('change_grouping', source='cardsetview',
-                cardsetname=sCardSetName, showexp=sExpMode,
-                curfilter=sFilter))
+                                    cardsetname=sCardSetName,
+                                    showexp=sExpMode,
+                                    curfilter=sFilter))
         elif 'filter' in request.form:
             sGrouping = request.values.get('curgrouping', 'Card Type')
             sExpMode = request.values.get('showexp', 'Hide')
             return redirect(url_for('filter', source='cardsetview',
-                cardsetname=sCardSetName, showexp=sExpMode,
-                grouping=sGrouping))
+                                    cardsetname=sCardSetName,
+                                    showexp=sExpMode,
+                                    grouping=sGrouping))
         elif 'download' in request.form:
             if oCS:
                 oWriter = PhysicalCardSetWriter()
@@ -222,24 +224,26 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
                 oWriter.write(oXMLFile, CardSetWrapper(oCS))
                 oXMLFile.seek(0)  # reset to start
                 return send_file(oXMLFile,
-                        mimetype="application/octet-stream",
-                        as_attachment=True,
-                        attachment_filename=safe_filename(
-                            "%s.xml" % sCorrectName))
+                                 mimetype="application/octet-stream",
+                                 as_attachment=True,
+                                 attachment_filename=safe_filename(
+                                     "%s.xml" % sCorrectName))
             else:
                 return render_template('invalid.html', type='Card Set Name',
-                        requested=sCardSetName)
+                                       requested=sCardSetName)
         elif 'expansions' in request.form:
             sFilter = request.values.get('curfilter', '')
             sGrouping = request.values.get('curgrouping', 'Card Type')
             if request.values['expansions'] == 'Hide Expansions':
                 return redirect(url_for('cardsetview',
-                    sCardSetName=sCardSetName, sGrouping=sGrouping,
-                    sExpMode='Hide', filter=sFilter))
+                                        sCardSetName=sCardSetName,
+                                        sGrouping=sGrouping,
+                                        sExpMode='Hide', filter=sFilter))
             else:
                 return redirect(url_for('cardsetview',
-                    sCardSetName=sCardSetName, sGrouping=sGrouping,
-                    sExpMode='Show', filter=sFilter))
+                                        sCardSetName=sCardSetName,
+                                        sGrouping=sGrouping,
+                                        sExpMode='Show', filter=sFilter))
     elif request.method == 'GET':
         if oCS:
             dCards = {}
@@ -258,11 +262,12 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
             else:
                 aCards = oCS.cards
             for oCard in aCards:
-                oCount = dCards.setdefault(oCard.abstractCard,
-                        CardCount(oCard.abstractCard))
+                iCardCount = CardCount(oCard.abstractCard)
+                oCount = dCards.setdefault(oCard.abstractCard, iCardCount)
                 oCount.cnt += 1
+                iExpCount = ExpCount(oCard.expansion)
                 oExpCount = oCount.expansions.setdefault(oCard.expansion,
-                        ExpCount(oCard.expansion))
+                                                         iExpCount)
                 oExpCount.cnt += 1
                 if is_crypt_card(oCard.abstractCard):
                     dCounts['crypt'] += 1
@@ -273,14 +278,14 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
             if not sGrouping:
                 sGrouping = 'Card Type'
             return render_template('cardsetview.html', cardset=oCS,
-                    grouped=aGrouped, counts=dCounts,
-                    quotedname=urllib.quote(oCS.name, safe=''),
-                    curfilter=sFilter,
-                    grouping=sGrouping,
-                    showexpansions=bShowExpansions)
+                                   grouped=aGrouped, counts=dCounts,
+                                   quotedname=urllib.quote(oCS.name, safe=''),
+                                   curfilter=sFilter,
+                                   grouping=sGrouping,
+                                   showexpansions=bShowExpansions)
         else:
             return render_template('invalid.html', type='Card Set Name',
-                    requested=sCardSetName)
+                                   requested=sCardSetName)
 
 
 @app.route('/card/<sCardName>')
@@ -293,8 +298,8 @@ def print_card(sCardName):
     if oCard:
         if oCard.text:
             # Mark errata clearly
-            sText = oCard.text.replace('{',
-                    '<span class="errata">').replace('}', '</span>')
+            sText = oCard.text.replace(
+                '{', '<span class="errata">').replace('}', '</span>')
             # We split text into lines, so they can be neatly
             # formatted by the template
             # FIXME: This is messy - should we preserve more formatting
@@ -322,20 +327,20 @@ def print_card(sCardName):
                 dExp[oPair.expansion.name].append(oPair.rarity.name)
             # Create the sorted display list
             aExpansions = [(x, ", ".join(sorted(dExp[x])))
-                    for x in sorted(dExp)]
+                           for x in sorted(dExp)]
         else:
             aExpansions = []
         if oCard.rulings:
             aRulings = [(oR.text.replace("\n", " "), oR.code, oR.url)
-                    for oR in oCard.rulings]
+                        for oR in oCard.rulings]
         else:
             aRulings = []
         return render_template('card.html', card=oCard, text=aText,
-                icons=dIcons, expansions=aExpansions,
-                rulings=aRulings)
+                               icons=dIcons, expansions=aExpansions,
+                               rulings=aRulings)
     else:
         return render_template('invalid.html', type='Card Name',
-                requested=sCardName)
+                               requested=sCardName)
 
 
 @app.route('/grouping', methods=['GET', 'POST'])
@@ -347,9 +352,9 @@ def change_grouping():
         sExpMode = request.args.get('showexp', 'Hide')
         sFilter = request.args.get('curfilter', '')
         return render_template('grouping.html',
-                groupings=sorted(ALLOWED_GROUPINGS), source=sSource,
-                cardsetname=sCardSet, showexp=sExpMode,
-                curfilter=sFilter)
+                               groupings=sorted(ALLOWED_GROUPINGS),
+                               source=sSource, cardsetname=sCardSet,
+                               showexp=sExpMode, curfilter=sFilter)
     elif request.method == 'POST':
         sNewGrouping = request.form['grouping']
         sFilter = request.form['curfilter']
@@ -357,17 +362,18 @@ def change_grouping():
         if sSource == 'cardlist':
             if sFilter and sFilter != 'None':
                 return redirect(url_for(sSource, sGrouping=sNewGrouping,
-                    filter=sFilter))
+                                        filter=sFilter))
             return redirect(url_for(sSource, sGrouping=sNewGrouping))
         else:
             sCardSet = request.form['cardset']
             sExpMode = request.form['showexp']
             if sFilter and sFilter != 'None':
                 return redirect(url_for(sSource, sCardSetName=sCardSet,
-                    sGrouping=sNewGrouping, sExpMode=sExpMode,
-                    filter=sFilter))
+                                        sGrouping=sNewGrouping,
+                                        sExpMode=sExpMode, filter=sFilter))
             return redirect(url_for(sSource, sCardSetName=sCardSet,
-                sGrouping=sNewGrouping, sExpMode=sExpMode))
+                                    sGrouping=sNewGrouping,
+                                    sExpMode=sExpMode))
     else:
         print 'Error, fell off the back of the world'
 
@@ -381,11 +387,11 @@ def cardlist(sGrouping=None):
         if 'grouping' in request.form:
             sFilter = request.values.get('curfilter', '')
             return redirect(url_for('change_grouping', source='cardlist',
-                curfilter=sFilter))
+                                    curfilter=sFilter))
         elif 'filter' in request.form:
             sGroup = request.values.get('curgrouping', 'Card Type')
             return redirect(url_for('filter', source='cardlist',
-                grouping=sGroup))
+                                    grouping=sGroup))
     if sGrouping is None:
         sGroup = 'Card Type'
     else:
@@ -401,8 +407,8 @@ def cardlist(sGrouping=None):
     cGrouping = ALLOWED_GROUPINGS.get(sGrouping, CardTypeGrouping)
     aGrpData = cGrouping(oFilter.select(AbstractCard), IAbstractCard)
     return render_template('cardlist.html', grouped=aGrpData,
-            groupings=sorted(ALLOWED_GROUPINGS),
-            grouping=sGroup, curfilter=sFilter)
+                           groupings=sorted(ALLOWED_GROUPINGS),
+                           grouping=sGroup, curfilter=sFilter)
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -417,7 +423,7 @@ def simple_search(sType='Card Name'):
                 sFilter = 'CardText = "%s"' % request.form['searchtext']
             else:
                 return render_template('invalid.html', type='Search Type',
-                        requested=sType)
+                                       requested=sType)
             return redirect(url_for('cardlist', filter=sFilter))
         else:
             return redirect(url_for('cardlist'))
@@ -425,7 +431,7 @@ def simple_search(sType='Card Name'):
         if sType in ['Card Name', 'Card Text']:
             return render_template('simple_search.html', type=sType)
         return render_template('invalid.html', type='Search Type',
-                requested=sType)
+                               requested=sType)
 
 
 @app.route('/filter', methods=['GET', 'POST'])
@@ -446,15 +452,15 @@ def filter():
         for sElement, sFilter, _ in LIST_FILTERS:
             if sElement in request.form:
                 sValues = ','.join(['"%s"' % x for x in
-                    request.form.getlist(sElement)])
+                                    request.form.getlist(sElement)])
                 aFilterBits.append('%s = %s' % (sFilter, sValues))
         sTotalFilter = sComb.join(aFilterBits)
         if sSource == 'cardlist':
             return redirect(url_for(sSource, sGrouping=sCurGrouping,
-                filter=sTotalFilter))
+                                    filter=sTotalFilter))
         return redirect(url_for(sSource, sCardSetName=sCardSet,
-            sGrouping=sCurGrouping, sExpMode=sExpMode,
-            filter=sTotalFilter))
+                                sGrouping=sCurGrouping, sExpMode=sExpMode,
+                                filter=sTotalFilter))
     else:
         sSource = request.args.get('source', 'cardlist')
         sCardSet = request.args.get('cardsetname', '')
@@ -464,8 +470,10 @@ def filter():
         for sElement, sText, cCls in LIST_FILTERS:
             aListFilters.append((sElement, sText, cCls.get_values()))
         return render_template('filter.html', grouping=sGroupBy,
-                source=sSource, cardsetname=sCardSet, showexp=sExpMode,
-                listfilters=aListFilters, stringfilters=STRING_FILTERS)
+                               source=sSource, cardsetname=sCardSet,
+                               showexp=sExpMode,
+                               listfilters=aListFilters,
+                               stringfilters=STRING_FILTERS)
 
 
 if __name__ == "__main__":
