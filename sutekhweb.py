@@ -111,8 +111,10 @@ class CardCount(object):
 
 
 class WebIconManager(IconManager):
+    """Handle icons for the web app"""
 
     def _get_icon(self, sFileName, _iSize=12):
+        """Return the correct url for the icon"""
         if sFileName:
             return url_for('static',
                            filename='/'.join((self._sPrefsDir, sFileName)))
@@ -153,6 +155,7 @@ PARSER = FilterParser()
 
 # default config
 class DefConfig(object):
+    """Default config for the web app"""
     DEBUG = False
     LISTEN = '0.0.0.0'
     SUTEKH_PREFS = prefs_dir("Sutekh")
@@ -162,10 +165,13 @@ class DefConfig(object):
 
 @app.route('/')
 def start():
+    """Entry point for the flask web app"""
     return render_template('index.html', groupings=sorted(ALLOWED_GROUPINGS))
 
 
 def get_all_children(oParent, iId, oParNode=None):
+    """Get all the child card sets of the given parent card set and add
+       then to a CardSetTree"""
     aResult = []
     for oCS in sorted(find_children(oParent), key=lambda x: x.name):
         iId += 1
@@ -199,6 +205,7 @@ def cardsets():
 @app.route('/cardsetview/<sCardSetName>/<sGrouping>/<sExpMode>',
            methods=['GET', 'POST'])
 def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
+    """Show the card set with the given name and parameters"""
     sCorrectName = urllib.unquote(sCardSetName)
     try:
         oCS = IPhysicalCardSet(sCorrectName)
