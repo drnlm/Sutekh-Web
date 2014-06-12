@@ -414,11 +414,18 @@ def cardlist(sGrouping=None):
             oFilter = NullFilter()
     else:
         oFilter = NullFilter()
+    dCounts = {'crypt': 0, 'library': 0}
     cGrouping = ALLOWED_GROUPINGS.get(sGrouping, CardTypeGrouping)
+    for oCard in oFilter.select(AbstractCard):
+        if is_crypt_card(oCard):
+            dCounts['crypt'] += 1
+        else:
+            dCounts['library'] += 1
     aGrpData = cGrouping(oFilter.select(AbstractCard), IAbstractCard)
     return render_template('cardlist.html', grouped=aGrpData,
                            groupings=sorted(ALLOWED_GROUPINGS),
-                           grouping=sGroup, curfilter=sFilter)
+                           counts=dCounts, grouping=sGroup,
+                           curfilter=sFilter)
 
 
 @app.route('/search', methods=['GET', 'POST'])
