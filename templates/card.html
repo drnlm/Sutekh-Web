@@ -93,6 +93,28 @@
    </ul>
 </div>
 {% endif %}
+{% if card.capacity %}
+<div id="capacity">
+   <p>Capacity: {{ card.capacity }}</p>
+</div>
+{% endif %}
+{% if card.life %}
+<div id="life">
+   <p>Life: {{ card.life}}</p>
+</div>
+{% endif %}
+{% if card.cost %}
+<div id="cost">
+   {% if card.cost == -1 %}
+   <p>Cost: X
+   {% else %}
+   <p>Cost: {{ card.cost}}
+   {% endif %}
+   {{ card.costtype }}</p>
+</div>
+{% endif %}
+
+
 {% if card.text %}
 <div id="text">
    <h2>Text</h2>
