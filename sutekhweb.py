@@ -143,7 +143,12 @@ class WebIconManager(IconManager):
             elif oItem == IKeyword('advanced'):
                 dIcons.update({oItem.keyword:
                                self.get_icon_by_name('advanced')})
-        return dIcons
+        dNewIcons = {}
+        for sName, oIcon in dIcons.items():
+            # Filter out any icons for which there is no filename
+            if oIcon:
+                dNewIcons[sName] = oIcon
+        return dNewIcons
 
 
 # Icon Manager is global, so we don't have to keep creating it
