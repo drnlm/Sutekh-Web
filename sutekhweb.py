@@ -14,10 +14,11 @@ import urllib
 from StringIO import StringIO
 
 from sqlobject import sqlhub, connectionForURI, SQLObjectNotFound
-from sutekh.base.core.BaseObjects import (AbstractCard, IAbstractCard,
-                                          IPhysicalCardSet, IKeyword,
-                                          MapPhysicalCardToPhysicalCardSet,
-                                          IPhysicalCard)
+
+from sutekh.base.core.BaseTables import (AbstractCard,
+                                         MapPhysicalCardToPhysicalCardSet)
+from sutekh.base.core.BaseAdapters import (IAbstractCard, IPhysicalCardSet,
+                                           IKeyword, IPhysicalCard)
 from sutekh.base.core.FilterParser import FilterParser, escape
 from sutekh.base.core.CardSetHolder import CardSetWrapper
 from sutekh.base.core.CardSetUtilities import find_children, has_children
@@ -27,7 +28,9 @@ from sutekh.base.core.BaseFilters import (NullFilter, MultiCardTypeFilter,
 from sutekh.base.core.BaseGroupings import (MultiTypeGrouping,
                                             NullGrouping,
                                             CardTypeGrouping)
+from sutekh.base.core.DBUtility import init_cache
 from sutekh.base.Utility import sqlite_uri, prefs_dir, safe_filename
+
 from sutekh.core.Filters import (MultiClanFilter, MultiVirtueFilter,
                                  MultiCreedFilter,
                                  MultiDisciplineFilter)
@@ -509,6 +512,8 @@ if __name__ == "__main__":
     oConn = connectionForURI(app.config['DATABASE_URI'])
     sqlhub.processConnection = oConn
     bDebug = app.config['DEBUG']
+    # Initialise database caches
+    init_cache()
     if bDebug:
         app.run()
     else:
