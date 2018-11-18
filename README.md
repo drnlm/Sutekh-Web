@@ -1,3 +1,9 @@
+Sutekh-Web
+==========
+
+Description
+-----------
+
 This is a simple flask based web-interface to the sutekh card database
 
 It currently allows:
@@ -17,7 +23,7 @@ Jinja2 2.6
 Configuration:
 --------------
 
-You can specify a config file to load by setting the 'SUTEKH_WEB_CONFIG'
+You can specify a config file to load by setting the `SUTEKH_WEB_CONFIG`
 enviroment variable to point to the correct file.
 
 Supporting icons:
