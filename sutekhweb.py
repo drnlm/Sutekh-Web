@@ -18,7 +18,8 @@ from sqlobject import sqlhub, connectionForURI, SQLObjectNotFound
 from sutekh.base.core.BaseTables import (AbstractCard,
                                          MapPhysicalCardToPhysicalCardSet)
 from sutekh.base.core.BaseAdapters import (IAbstractCard, IPhysicalCardSet,
-                                           IKeyword, IPhysicalCard)
+                                           IKeyword, IPhysicalCard,
+                                           IPrintingName)
 from sutekh.base.core.FilterParser import FilterParser, escape
 from sutekh.base.core.CardSetHolder import CardSetWrapper
 from sutekh.base.core.CardSetUtilities import find_children, has_children
@@ -89,28 +90,28 @@ class CardSetTree(object):
         self.info = ''
 
 
-class ExpCount(object):
+class PrintingCount(object):
     """Helper object from counting expansion info"""
 
-    __slots__ = ['expname', 'cnt']
+    __slots__ = ['print_name', 'cnt']
 
-    def __init__(self, oExp):
-        if oExp:
-            self.expname = oExp.name
+    def __init__(self, oPrinting):
+        if oPrinting:
+            self.print_name = IPrintingName(oPrinting)
         else:
-            self.expname = ' Unknown Expansion'
+            self.print_name = ' Unknown Expansion'
         self.cnt = 0
 
 
 class CardCount(object):
     """Helper object for counting cards in a card set"""
 
-    __slots__ = ['card', 'cnt', 'expansions']
+    __slots__ = ['card', 'cnt', 'printings']
 
     def __init__(self, oCard):
         self.card = oCard
         self.cnt = 0
-        self.expansions = {}
+        self.printings = {}
 
 
 class WebIconManager(IconManager):
@@ -283,10 +284,10 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
                 iCardCount = CardCount(oCard.abstractCard)
                 oCount = dCards.setdefault(oCard.abstractCard, iCardCount)
                 oCount.cnt += 1
-                iExpCount = ExpCount(oCard.expansion)
-                oExpCount = oCount.expansions.setdefault(oCard.expansion,
-                                                         iExpCount)
-                oExpCount.cnt += 1
+                iPrintingCount = PrintingCount(oCard.printing)
+                oPrintingCount = oCount.printings.setdefault(oCard.printing,
+                                                         iPrintingCount)
+                oPrintingCount.cnt += 1
                 if is_crypt_card(oCard.abstractCard):
                     dCounts['crypt'] += 1
                 else:

@@ -41,8 +41,8 @@
 <tr id="{{ groupstep * grouploop.index + loop.index }}" class="child-of-{{ grouploop.index }}"><td>{{ item.cnt }} x <a href="/card/{{ item.card.name }}">{{ item.card.name }}</a></td></tr>
 {% if showexpansions %}
 {% set cardloop = loop %}
-{% for exp in item.expansions.values()|sort(attribute='expname') %}
-<tr id="{{ groupstep * expstep * grouploop.index + expstep * cardloop.index + loop.index }}" class="child-of-{{ grouploop.index * groupstep + cardloop.index }}"><td>{{ exp.cnt }} x {{ exp.expname }}</td></tr>
+{% for print in item.printings.values()|sort(attribute='print_name') %}
+<tr id="{{ groupstep * expstep * grouploop.index + expstep * cardloop.index + loop.index }}" class="child-of-{{ grouploop.index * groupstep + cardloop.index }}"><td>{{ print.cnt }} x {{ print.print_name }}</td></tr>
 {% endfor %}
 {% endif %}
 {% endfor %}
