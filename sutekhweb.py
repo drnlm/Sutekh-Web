@@ -10,8 +10,8 @@ from flask import (Flask, render_template, request, url_for, redirect,
 app = Flask(__name__)
 
 import os
-import urllib
-from StringIO import StringIO
+from urllib.parse import quote, unquote
+from io import StringIO, BytesIO
 
 from sqlobject import sqlhub, connectionForURI, SQLObjectNotFound
 
@@ -65,11 +65,11 @@ LIST_FILTERS = [('cardtype', 'CardType', MultiCardTypeFilter),
 
 # Utility classes and functions for passing info the jinja2 easily
 def double_quote(sString):
-    """Double quote a string with urllib.quote, including / as a quoted
+    """Double quote a string with urllib.parse.quote, including / as a quoted
        character.
 
        Needed to bypass flask's unquoting in some cases."""
-    return urllib.quote(urllib.quote(sString, safe=''))
+    return quote(quote(sString, safe=''))
 
 
 class CardSetTree(object):
@@ -215,7 +215,7 @@ def cardsets():
            methods=['GET', 'POST'])
 def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
     """Show the card set with the given name and parameters"""
-    sCorrectName = urllib.unquote(sCardSetName)
+    sCorrectName = unquote(sCardSetName)
     try:
         oCS = IPhysicalCardSet(sCorrectName)
     except SQLObjectNotFound:
@@ -242,7 +242,10 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
                 oXMLFile = StringIO()
                 oWriter.write(oXMLFile, CardSetWrapper(oCS))
                 oXMLFile.seek(0)  # reset to start
-                return send_file(oXMLFile,
+                # Convert to bytes for flask
+                oOutput = BytesIO(oXMLFile.getvalue().encode('utf8'))
+                oOutput.seek(0)
+                return send_file(oOutput,
                                  mimetype="application/octet-stream",
                                  as_attachment=True,
                                  attachment_filename=safe_filename(
@@ -298,7 +301,7 @@ def cardsetview(sCardSetName, sGrouping=None, sExpMode='Hide'):
                 sGrouping = 'Card Type'
             return render_template('cardsetview.html', cardset=oCS,
                                    grouped=aGrouped, counts=dCounts,
-                                   quotedname=urllib.quote(oCS.name, safe=''),
+                                   quotedname=quote(oCS.name, safe=''),
                                    curfilter=sFilter,
                                    grouping=sGrouping,
                                    showexpansions=bShowExpansions)
@@ -394,7 +397,7 @@ def change_grouping():
                                     sGrouping=sNewGrouping,
                                     sExpMode=sExpMode))
     else:
-        print 'Error, fell off the back of the world'
+        print('Error, fell off the back of the world')
 
 
 @app.route('/cardlist', methods=['GET', 'POST'])
