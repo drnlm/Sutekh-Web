@@ -1,0 +1,8 @@
+include README.md
+include MANIFEST.in
+include setup.cfg
+include pyproject.toml
+include sutekhweb.wsgi
+include static/*css
+recursive-include static/jquery/ jquery* *png READNE
+include sutekhweb/*py

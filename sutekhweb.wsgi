@@ -1,1 +1,1 @@
-from sutekhweb import app as application
+from sutekhweb.sutekhweb import app as application
