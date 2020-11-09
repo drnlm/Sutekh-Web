@@ -43,5 +43,5 @@ nosetests.xml
 
 # Sutekh-Web
 *.conf
-static/icons
+sutekhweb/static/icons
 scripts
