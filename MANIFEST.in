@@ -2,4 +2,5 @@ include MANIFEST.in
 include pyproject.toml
 include sutekhweb.wsgi
 recursive-include sutekhweb/static/ *css jquery*js *png README
+recursive-include sutekhweb/templates/ *html
 include sutekhweb/*py
