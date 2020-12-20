@@ -32,3 +32,12 @@ Supporting icons:
 To display icons, copy the icons downloaded by sutekh into /static/icons
 (maintaining the directory structure, so clans in /static/icons/clans and so
 forth) and set 'ICONS = True' in the config file
+
+Jquery Tree support
+-------------------
+
+Sutekh-Web includes jquery and jquery.treeTable under static/jquery to simplify
+deployment - these can be replaced if required.
+
+This includes jquery 3.5.1 and jquery.treeTable 3.2.0-1, downloaded via npm in
+November 2020.
