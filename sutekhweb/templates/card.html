@@ -103,6 +103,11 @@
    <p>Life: {{ card.life}}</p>
 </div>
 {% endif %}
+{% if card.group %}
+<div id="group">
+   <p>Group: {{ card.group }}</p>
+</div>
+{% endif %}
 {% if card.cost %}
 <div id="cost">
    {% if card.cost == -1 %}
