@@ -1,9 +1,4 @@
 {% extends "base.html" %}
-{% block jscript %}<script type="text/javascript">
-   $(document).ready(function()  {
-      $("#cardlist").treeTable();
-   });
-</script>{% endblock %}
 {% block title %}V:EKN Cardlist{% endblock %}
 {% block content %}
 <h1>The V:EKN Cardlist</h1>
@@ -18,10 +13,10 @@
 
 <table id="cardlist">
 {% for group, cards in grouped %}
-<tr id="{{ loop.index }}"><td>{{ group }}</td></tr>
+<tr data-tt-id="{{ loop.index }}"><td>{{ group }}</td></tr>
 {% set grouploop = loop %}
 {% for card in cards %}
-<tr id="{{ grouploop.index * groupstep + loop.index }}" class="child-of-{{ grouploop.index }}"><td><a href="/card/{{ card.name }}">{{ card.name }}</a></td></tr>
+<tr data-tt-id="{{ grouploop.index * groupstep + loop.index }}" data-tt-parent-id="{{ grouploop.index }}"><td><a href="/card/{{ card.name }}">{{ card.name }}</a></td></tr>
 {% endfor %}
 {% endfor %}
 </table>
@@ -37,4 +32,9 @@
 {% endblock %}
 {% block navigation %}
 <p>Return to <a href="/">Main page</a></p>
+{% endblock %}
+{% block jscript %}
+<script type="text/javascript">
+   $("#cardlist").treetable({ expandable: true });
+</script>
 {% endblock %}
